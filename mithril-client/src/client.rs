@@ -24,6 +24,9 @@ use anyhow::Context;
 
 use crate::common::*;
 use crate::services::{MithrilStakeDistributionService, SnapshotService};
+
+#[cfg(target_family = "wasm")]
+use wasm_bindgen::prelude::*;
 /// Client structure that instanciates required dependencies
 pub struct Client {
     snapshot_service: Arc<dyn SnapshotService>,
@@ -59,6 +62,7 @@ impl Client {
     }
 
     /// Call the snapshot service to get the list of available snapshots
+    #[cfg_attr(target_family = "wasm", wasm_bindgen)]
     pub async fn list_snapshots(&self) -> StdResult<Vec<SnapshotListItemMessage>> {
         self.snapshot_service.list().await
     }

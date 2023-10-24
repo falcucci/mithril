@@ -72,12 +72,12 @@ mithril-common = { path = "../mithril-common" }
 mockall = "0.11.4"
 warp = "0.3"
 
-#[target.'cfg(target_family = "wasm")'.dependencies]
-#wasm-bindgen = "0.2"
-#wasm-bindgen-futures = "0.4.37"
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4.37"
 
 [features]
 portable = ["mithril-common/portable"]
 bundle_openssl = ["dep:openssl", "dep:openssl-probe"]
 build-binary = ["clap", "config", "cli-table"]
-no_wasm = ["fs2"]
+no_wasm = ["fs2", "mithril-common/no_wasm"]
