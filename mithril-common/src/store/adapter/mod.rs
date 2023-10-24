@@ -2,10 +2,12 @@
 //! an adapter [in memory][MemoryAdapter] and another [sqlite][SQLiteAdapter].
 
 mod memory_adapter;
+#[cfg(feature = "no_wasm")]
 mod sqlite_adapter;
 mod store_adapter;
 
 pub use memory_adapter::MemoryAdapter;
+#[cfg(feature = "no_wasm")]
 pub use sqlite_adapter::{SQLiteAdapter, SQLiteResultIterator};
 pub use store_adapter::*;
 

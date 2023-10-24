@@ -123,6 +123,7 @@ impl SignerBuilder {
         ))
     }
 
+    #[cfg(feature = "no_wasm")]
     /// Build non deterministic [SingleSigner] and [ProtocolInitializer] based on the registered parties.
     pub fn build_single_signer(
         &self,

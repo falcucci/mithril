@@ -15,6 +15,7 @@ mod beacon_provider;
 pub mod certificate_chain;
 pub mod chain_observer;
 pub mod crypto_helper;
+#[cfg(feature = "no_wasm")]
 pub mod database;
 pub mod digesters;
 pub mod entities;
@@ -23,6 +24,7 @@ pub mod era;
 pub mod messages;
 pub mod protocol;
 pub mod signable_builder;
+#[cfg(feature = "no_wasm")]
 pub mod sqlite;
 pub mod store;
 pub mod test_utils;

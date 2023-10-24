@@ -6,11 +6,13 @@
 //! * A builder of [MithrilFixture] to generate signers alongside a stake distribution
 //!
 
+#[cfg(feature = "no_wasm")]
 pub mod apispec;
 pub mod fake_data;
 pub mod fake_keys;
 mod fixture_builder;
 mod mithril_fixture;
+#[cfg(feature = "no_wasm")]
 pub mod test_http_server;
 
 pub use fixture_builder::{MithrilFixtureBuilder, StakeDistributionGenerationMethod};

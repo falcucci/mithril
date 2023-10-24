@@ -1,8 +1,11 @@
 use ed25519_dalek::{Signer, SigningKey};
-use rand_chacha::rand_core::{self, CryptoRng, RngCore, SeedableRng};
+use rand_chacha::rand_core::{CryptoRng, RngCore, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+
+#[cfg(feature = "no_wasm")]
+use rand_chacha::rand_core;
 
 use crate::{StdError, StdResult};
 
@@ -47,6 +50,7 @@ impl EraMarkersSigner {
         Self::create_test_signer(rng)
     }
 
+    #[cfg(feature = "no_wasm")]
     /// [EraMarkersSigner] non deterministic
     pub fn create_non_deterministic_signer() -> Self {
         let rng = rand_core::OsRng;
@@ -136,6 +140,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "no_wasm")]
     #[test]
     fn test_generate_test_non_deterministic_keypair() {
         let signer = EraMarkersSigner::create_non_deterministic_signer();

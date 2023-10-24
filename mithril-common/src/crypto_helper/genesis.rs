@@ -1,11 +1,14 @@
 use crate::{StdError, StdResult};
 use anyhow::anyhow;
 use ed25519_dalek::{Signer, SigningKey};
-use rand_chacha::rand_core::{self, CryptoRng, RngCore, SeedableRng};
+use rand_chacha::rand_core::{CryptoRng, RngCore, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use std::{fs::File, io::Write, path::Path};
 use thiserror::Error;
+
+#[cfg(feature = "no_wasm")]
+use rand_chacha::rand_core;
 
 use super::{ProtocolGenesisSecretKey, ProtocolGenesisSignature, ProtocolGenesisVerificationKey};
 
@@ -38,6 +41,7 @@ impl ProtocolGenesisSigner {
         Self::create_test_genesis_signer(rng)
     }
 
+    #[cfg(feature = "no_wasm")]
     /// [ProtocolGenesisSigner] non deterministic
     pub fn create_non_deterministic_genesis_signer() -> Self {
         let rng = rand_core::OsRng;
@@ -125,6 +129,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "no_wasm")]
     #[test]
     fn test_generate_test_non_deterministic_genesis_keypair() {
         let genesis_signer = ProtocolGenesisSigner::create_non_deterministic_genesis_signer();

@@ -1,7 +1,9 @@
+use crate::StdResult;
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumDiscriminants};
 
-use crate::{sqlite::HydrationError, StdResult};
+#[cfg(feature = "no_wasm")]
+use crate::sqlite::HydrationError;
 
 use super::{Beacon, Epoch};
 
@@ -46,6 +48,8 @@ impl SignedEntityType {
             Self::CardanoStakeDistribution(e) | Self::MithrilStakeDistribution(e) => *e,
         }
     }
+
+    #[cfg(feature = "no_wasm")]
     /// Create an instance from data coming from the database
     pub fn hydrate(signed_entity_type_id: usize, beacon_str: &str) -> Result<Self, HydrationError> {
         let myself = match signed_entity_type_id {
