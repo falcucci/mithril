@@ -76,7 +76,8 @@ pub enum MithrilStakeDistributionServiceError {
 }
 
 /// Definition of the service responsible of Mithril Stake Distribution.
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 pub trait MithrilStakeDistributionService {
     /// Return a list of the certified Mithril stake distributions
     async fn list(&self) -> StdResult<Vec<MithrilStakeDistributionListItemMessage>>;
@@ -142,7 +143,8 @@ impl AppMithrilStakeDistributionService {
     }
 }
 
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 impl MithrilStakeDistributionService for AppMithrilStakeDistributionService {
     async fn list(&self) -> StdResult<Vec<MithrilStakeDistributionListItemMessage>> {
         self.stake_distribution_client.list().await

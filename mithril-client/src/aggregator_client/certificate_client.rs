@@ -48,7 +48,8 @@ impl CertificateClient {
     }
 }
 
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 impl CertificateRetriever for CertificateClient {
     async fn get_certificate_details(
         &self,

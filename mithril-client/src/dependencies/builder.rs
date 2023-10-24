@@ -7,7 +7,7 @@ use slog::Logger;
 use mithril_common::{
     api_version::APIVersionProvider,
     certificate_chain::{CertificateVerifier, MithrilCertificateVerifier},
-    digesters::{CardanoImmutableDigester, ImmutableDigester},
+    digesters::ImmutableDigester,
     StdResult,
 };
 use thiserror::Error;
@@ -22,6 +22,9 @@ use crate::{
         MithrilStakeDistributionService, SnapshotService,
     },
 };
+
+#[cfg(feature = "no_wasm")]
+use mithril_common::digesters::CardanoImmutableDigester;
 
 /// Configuration error
 #[derive(Debug, Error)]
@@ -240,12 +243,14 @@ impl DependenciesBuilder {
         Ok(self.certificate_verifier.as_ref().cloned().unwrap())
     }
 
+    #[cfg(feature = "no_wasm")]
     async fn build_immutable_digester(&mut self) -> StdResult<Arc<dyn ImmutableDigester>> {
         let digester = CardanoImmutableDigester::new(None, self.get_logger().await?);
 
         Ok(Arc::new(digester))
     }
 
+    #[cfg(feature = "no_wasm")]
     /// Get a clone of the [ImmutableDigester] dependency
     pub async fn get_immutable_digester(&mut self) -> StdResult<Arc<dyn ImmutableDigester>> {
         if self.immutable_digester.is_none() {
@@ -259,6 +264,7 @@ impl DependenciesBuilder {
         Ok(self.immutable_digester.as_ref().cloned().unwrap())
     }
 
+    #[cfg(feature = "no_wasm")]
     async fn build_snapshot_service(&mut self) -> StdResult<Arc<dyn SnapshotService>> {
         let snapshot_service = MithrilClientSnapshotService::new(
             self.get_snapshot_client().await?,
@@ -266,6 +272,13 @@ impl DependenciesBuilder {
             self.get_certificate_verifier().await?,
             self.get_immutable_digester().await?,
         );
+
+        Ok(Arc::new(snapshot_service))
+    }
+
+    #[cfg(not(feature = "no_wasm"))]
+    async fn build_snapshot_service(&mut self) -> StdResult<Arc<dyn SnapshotService>> {
+        let snapshot_service = MithrilClientSnapshotService::new(self.get_snapshot_client().await?);
 
         Ok(Arc::new(snapshot_service))
     }

@@ -1,8 +1,7 @@
 //! This module contains a struct to exchange snapshot information with the Aggregator
 
 use anyhow::Context;
-use slog_scope::warn;
-use std::{path::Path, sync::Arc};
+use std::sync::Arc;
 use thiserror::Error;
 
 use mithril_common::{
@@ -11,10 +10,16 @@ use mithril_common::{
     StdResult,
 };
 
-use crate::utils::DownloadProgressReporter;
 use crate::{
     aggregator_client::AggregatorClient, message_adapters::ToSnapshotDownloadMessageAdapter,
 };
+
+#[cfg(feature = "no_wasm")]
+use crate::utils::DownloadProgressReporter;
+#[cfg(feature = "no_wasm")]
+use slog_scope::warn;
+#[cfg(feature = "no_wasm")]
+use std::path::Path;
 
 /// Error for the Snapshot client
 #[derive(Error, Debug)]
@@ -69,6 +74,7 @@ impl SnapshotClient {
         Ok(message)
     }
 
+    #[cfg(feature = "no_wasm")]
     /// Download and unpack the given snapshot to the given directory
     pub async fn download_unpack(
         &self,

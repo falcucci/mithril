@@ -1,21 +1,28 @@
 use anyhow::anyhow;
 use async_recursion::async_recursion;
 use async_trait::async_trait;
-use futures::StreamExt;
 use reqwest::{Client, Response, StatusCode};
 use semver::Version;
 use slog_scope::debug;
-use std::{path::Path, sync::Arc};
+use std::sync::Arc;
 use thiserror::Error;
 use tokio::sync::RwLock;
 
 #[cfg(test)]
 use mockall::automock;
 
-use mithril_common::{
-    entities::CompressionAlgorithm, StdError, StdResult, MITHRIL_API_VERSION_HEADER,
-};
+use mithril_common::{StdError, MITHRIL_API_VERSION_HEADER};
 
+#[cfg(feature = "no_wasm")]
+use futures::StreamExt;
+
+#[cfg(feature = "no_wasm")]
+use mithril_common::{entities::CompressionAlgorithm, StdResult};
+
+#[cfg(feature = "no_wasm")]
+use std::path::Path;
+
+#[cfg(feature = "no_wasm")]
 use crate::utils::{DownloadProgressReporter, SnapshotUnpacker};
 
 /// Error tied with the Aggregator client
@@ -39,7 +46,8 @@ pub enum AggregatorHTTPClientError {
 }
 
 /// API that defines a client for the Aggregator
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 pub trait AggregatorClient: Sync + Send {
     /// Get the content back from the Aggregator, the URL is a relative path for a resource
     async fn get_content(&self, url: &str) -> Result<String, AggregatorHTTPClientError>;
@@ -51,6 +59,7 @@ pub trait AggregatorClient: Sync + Send {
         json: &str,
     ) -> Result<String, AggregatorHTTPClientError>;
 
+    #[cfg(feature = "no_wasm")]
     /// Download and unpack large archives on the disk
     async fn download_unpack(
         &self,
@@ -105,7 +114,8 @@ impl AggregatorHTTPClient {
     }
 
     /// Perform a HTTP GET request on the Aggregator and return the given JSON
-    #[async_recursion]
+    #[cfg_attr(target_arch = "wasm32", async_recursion(?Send))]
+    #[cfg_attr(not(target_arch = "wasm32"), async_recursion)]
     async fn get(&self, url: &str) -> Result<Response, AggregatorHTTPClientError> {
         debug!("GET url='{url}'.");
         let request_builder = Client::new().get(url.to_owned());
@@ -144,7 +154,8 @@ impl AggregatorHTTPClient {
     }
 
     /// Issue a POST HTTP request.
-    #[async_recursion]
+    #[cfg_attr(target_arch = "wasm32", async_recursion(?Send))]
+    #[cfg_attr(not(target_arch = "wasm32"), async_recursion)]
     async fn post(&self, url: &str, json: &str) -> Result<Response, AggregatorHTTPClientError> {
         debug!("POST url='{url}' json='{json}'.");
         let request_builder = Client::new().post(url.to_owned()).body(json.to_owned());
@@ -201,7 +212,8 @@ impl AggregatorHTTPClient {
 }
 
 #[cfg_attr(test, automock)]
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 impl AggregatorClient for AggregatorHTTPClient {
     async fn get_content(&self, url: &str) -> Result<String, AggregatorHTTPClientError> {
         let url = format!("{}/{}", self.aggregator_endpoint.trim_end_matches('/'), url);
@@ -230,6 +242,7 @@ impl AggregatorClient for AggregatorHTTPClient {
         })
     }
 
+    #[cfg(feature = "no_wasm")]
     async fn download_unpack(
         &self,
         url: &str,
