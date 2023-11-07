@@ -464,6 +464,24 @@
 <a href="#464" id="464">464</a>
 <a href="#465" id="465">465</a>
 <a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pre hex encoded StmTypes for testing.
 
 /// A list of pre json hex encoded [MithrilStm:StmSig](type@mithril_stm::stm::StmSig)
@@ -770,6 +788,18 @@
     ]
 }
 
+<span class="doccomment">/// A list of pre json hex encoded [ed25519_dalek::VerifyingKey](https://docs.rs/ed25519-dalek/latest/ed25519_dalek/struct.VerifyingKey.html)
+</span><span class="kw">pub const fn </span>genesis_verification_key&lt;<span class="lifetime">&#39;a</span>&gt;() -&gt; [<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str; <span class="number">2</span>] {
+    [
+        <span class="string">&quot;5b33322c3235332c3138362c3230312c3137372c31312c3131372c3133352c3138372c3136372c3138312c3138\
+        382c32322c35392c3230362c3130352c3233312c3135302c3231352c33302c37382c3231322c37362c31362c323\
+        5322c3138302c37322c3133342c3133372c3234372c3136312c36385d&quot;</span>,
+        <span class="string">&quot;5b3132372c37332c3132342c3136312c362c3133372c3133312c3231332c3230372c3131372c3139382c38352c\
+        3137362c3139392c3136322c3234312c36382c3132332c3131392c3134352c31332c3233322c3234332c34392c3\
+        232392c322c3234392c3230352c3230352c33392c3233352c34345d&quot;</span>,
+    ]
+}
+
 <span class="doccomment">/// A list of pre json hex encoded [OpCert][crate::crypto_helper::OpCert]
 </span><span class="kw">pub const fn </span>operational_certificate&lt;<span class="lifetime">&#39;a</span>&gt;() -&gt; [<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str; <span class="number">2</span>] {
     [
@@ -822,6 +852,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>ed25519_dalek::VerifyingKey;
     <span class="kw">use </span>kes_summed_ed25519::kes::Sum6KesSig;
     <span class="kw">use </span>mithril_stm::stm::{StmAggrSig, StmAggrVerificationKey, StmSig, StmVerificationKeyPoP};
     <span class="kw">use </span>serde::{de::DeserializeOwned, Serialize};
@@ -916,6 +947,11 @@
         assert_can_deserialize_using_key_decode_hex::&lt;Sum6KesSig&gt;(
             <span class="kw-2">&amp;</span>signer_verification_key_signature(),
         );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>assert_encoded_genesis_verification_key_are_still_matching_concrete_type() {
+        assert_can_deserialize_using_key_decode_hex::&lt;VerifyingKey&gt;(<span class="kw-2">&amp;</span>genesis_verification_key());
     }
 
     <span class="attr">#[test]

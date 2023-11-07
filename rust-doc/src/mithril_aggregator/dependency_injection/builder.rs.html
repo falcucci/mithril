@@ -1194,6 +1194,9 @@
 <a href="#1194" id="1194">1194</a>
 <a href="#1195" id="1195">1195</a>
 <a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>anyhow::Context;
@@ -1817,7 +1820,10 @@
     }
 
     <span class="kw">async fn </span>build_certificate_verifier(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;<span class="kw">dyn </span>CertificateVerifier&gt;&gt; {
-        <span class="kw">let </span>verifier = Arc::new(MithrilCertificateVerifier::new(<span class="self">self</span>.get_logger().<span class="kw">await</span><span class="question-mark">?</span>));
+        <span class="kw">let </span>verifier = Arc::new(MithrilCertificateVerifier::new(
+            <span class="self">self</span>.get_logger().<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="self">self</span>.get_certificate_repository().<span class="kw">await</span><span class="question-mark">?</span>,
+        ));
 
         <span class="prelude-val">Ok</span>(verifier)
     }

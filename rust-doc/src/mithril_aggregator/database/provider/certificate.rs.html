@@ -1409,6 +1409,26 @@
 <a href="#1409" id="1409">1409</a>
 <a href="#1410" id="1410">1410</a>
 <a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::anyhow;
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>chrono::{DateTime, Utc};
@@ -1739,6 +1759,17 @@
 
         <span class="prelude-val">Ok</span>(certificate_record)
     }
+
+    <span class="doccomment">/// Return the last N certificates
+    </span><span class="kw">pub fn </span>get_latest(<span class="kw-2">&amp;</span><span class="self">self</span>, length: usize) -&gt; StdResult&lt;EntityCursor&lt;CertificateRecord&gt;&gt; {
+        <span class="kw">let </span>filters = WhereCondition::new(
+            <span class="string">&quot;c.ROWID &gt; top_n.max_rowid - ?*&quot;</span>,
+            <span class="macro">vec!</span>[Value::Integer(length.try_into().unwrap_or(i64::MAX))],
+        );
+        <span class="kw">let </span>certificate_record = <span class="self">self</span>.find(filters)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(certificate_record)
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;client</span>&gt; Provider&lt;<span class="lifetime">&#39;client</span>&gt; <span class="kw">for </span>CertificateRecordProvider&lt;<span class="lifetime">&#39;client</span>&gt; {
@@ -1749,9 +1780,18 @@
     }
 
     <span class="kw">fn </span>get_definition(<span class="kw-2">&amp;</span><span class="self">self</span>, condition: <span class="kw-2">&amp;</span>str) -&gt; String {
-        <span class="kw">let </span>aliases = SourceAlias::new(<span class="kw-2">&amp;</span>[(<span class="string">&quot;{:certificate:}&quot;</span>, <span class="string">&quot;c&quot;</span>)]);
+        <span class="kw">let </span>aliases = SourceAlias::new(<span class="kw-2">&amp;</span>[(<span class="string">&quot;{:certificate:}&quot;</span>, <span class="string">&quot;c&quot;</span>), (<span class="string">&quot;{:top_n:}&quot;</span>, <span class="string">&quot;top_n&quot;</span>)]);
         <span class="kw">let </span>projection = <span class="self">Self</span>::Entity::get_projection().expand(aliases);
-        <span class="macro">format!</span>(<span class="string">&quot;select {projection} from certificate as c where {condition} order by ROWID desc&quot;</span>)
+
+        <span class="macro">format!</span>(
+            <span class="string">r#&quot;with
+    top_n (max_rowid) as (select max(ROWID) from certificate)
+  select {projection}
+  from certificate as c 
+    cross join top_n
+  where {condition}
+  order by ROWID desc&quot;#
+        </span>)
     }
 }
 
@@ -1970,9 +2010,9 @@ order by certificate.ROWID desc&quot;#
     <span class="doccomment">/// Return the latest certificates.
     </span><span class="kw">pub async fn </span>get_latest_certificates(<span class="kw-2">&amp;</span><span class="self">self</span>, last_n: usize) -&gt; StdResult&lt;Vec&lt;Certificate&gt;&gt; {
         <span class="kw">let </span>provider = CertificateRecordProvider::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection);
-        <span class="kw">let </span>cursor = provider.get_all()<span class="question-mark">?</span>;
+        <span class="kw">let </span>cursor = provider.get_latest(last_n)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(cursor.take(last_n).map(|v| v.into()).collect())
+        <span class="prelude-val">Ok</span>(cursor.map(|v| v.into()).collect())
     }
 
     <span class="doccomment">/// Return the first certificate signed per epoch as the reference

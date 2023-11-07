@@ -324,6 +324,18 @@
 <a href="#324" id="324">324</a>
 <a href="#325" id="325">325</a>
 <a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>std::{fs::File, io::prelude::<span class="kw-2">*</span>, io::Write, path::Path, sync::Arc};
 
@@ -508,7 +520,10 @@
             genesis_signature,
         )<span class="question-mark">?</span>;
         <span class="self">self</span>.certificate_verifier
-            .verify_genesis_certificate(<span class="kw-2">&amp;</span>genesis_certificate, <span class="kw-2">&amp;</span><span class="self">self</span>.genesis_verifier)
+            .verify_genesis_certificate(
+                <span class="kw-2">&amp;</span>genesis_certificate,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.genesis_verifier.to_verification_key(),
+            )
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.certificate_repository
             .create_certificate(genesis_certificate.clone())
@@ -569,7 +584,10 @@
         <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         apply_all_migrations_to_db(<span class="kw-2">&amp;</span>connection).unwrap();
         <span class="kw">let </span>certificate_store = Arc::new(CertificateRepository::new(Arc::new(connection)));
-        <span class="kw">let </span>certificate_verifier = Arc::new(MithrilCertificateVerifier::new(slog_scope::logger()));
+        <span class="kw">let </span>certificate_verifier = Arc::new(MithrilCertificateVerifier::new(
+            slog_scope::logger(),
+            certificate_store.clone(),
+        ));
         <span class="kw">let </span>genesis_avk = create_fake_genesis_avk();
         <span class="kw">let </span>genesis_verifier = Arc::new(genesis_signer.create_genesis_verifier());
         <span class="kw">let </span>genesis_tools = GenesisTools::new(
@@ -621,7 +639,10 @@
 
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, last_certificates.len());
         certificate_verifier
-            .verify_genesis_certificate(<span class="kw-2">&amp;</span>last_certificates[<span class="number">0</span>], <span class="kw-2">&amp;</span>genesis_verifier)
+            .verify_genesis_certificate(
+                <span class="kw-2">&amp;</span>last_certificates[<span class="number">0</span>],
+                <span class="kw-2">&amp;</span>genesis_verifier.to_verification_key(),
+            )
             .<span class="kw">await
             </span>.expect(
                 <span class="string">&quot;verify_genesis_certificate should successfully validate the genesis certificate&quot;</span>,
@@ -643,7 +664,10 @@
 
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, last_certificates.len());
         certificate_verifier
-            .verify_genesis_certificate(<span class="kw-2">&amp;</span>last_certificates[<span class="number">0</span>], <span class="kw-2">&amp;</span>genesis_verifier)
+            .verify_genesis_certificate(
+                <span class="kw-2">&amp;</span>last_certificates[<span class="number">0</span>],
+                <span class="kw-2">&amp;</span>genesis_verifier.to_verification_key(),
+            )
             .<span class="kw">await
             </span>.expect(
                 <span class="string">&quot;verify_genesis_certificate should successfully validate the genesis certificate&quot;</span>,
