@@ -214,6 +214,10 @@
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
 <a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Fake data builders for testing.
 
 </span><span class="kw">use </span>chrono::{DateTime, Utc};
@@ -224,6 +228,7 @@
     entities::{
         <span class="self">self</span>, CertificateMetadata, CertificateSignature, CompressionAlgorithm, Epoch, LotteryIndex,
         ProtocolMessage, ProtocolMessagePartKey, SignedEntityType, SingleSignatures,
+        StakeDistributionParty,
     },
     test_utils::MithrilFixtureBuilder,
 };
@@ -321,7 +326,10 @@
     </span><span class="kw">let </span>protocol_parameters = protocol_parameters();
 
     <span class="comment">// Signers with stakes
-    </span><span class="kw">let </span>signers = signers_with_stakes(<span class="number">5</span>);
+    </span><span class="kw">let </span>signers: Vec&lt;StakeDistributionParty&gt; = signers_with_stakes(<span class="number">5</span>)
+        .into_iter()
+        .map(|s| s.into())
+        .collect();
 
     <span class="comment">// Certificate metadata
     </span><span class="kw">let </span>protocol_version = crypto_helper::PROTOCOL_VERSION.to_string();

@@ -605,6 +605,12 @@
 <a href="#605" id="605">605</a>
 <a href="#606" id="606">606</a>
 <a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::database::provider::{CertificateRepository, SignedEntityStorer};
 <span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>mithril_common::{entities::Certificate, StdResult};
@@ -716,13 +722,19 @@
         }
 
         <span class="comment">// 2 - Certificates migrated, we can insert them in the db
+        // (we do this by chunks in order to avoid reaching the limit of 32766 variables in a single query)
         </span><span class="macro">debug!</span>(<span class="string">&quot;🔧 Certificate Hash Migrator: inserting migrated certificates in the database&quot;</span>);
-        <span class="self">self</span>.certificate_repository
-            .create_many_certificates(migrated_certificates)
+        <span class="kw">let </span>migrated_certificates_chunk_size = <span class="number">250</span>;
+        <span class="kw">for </span>migrated_certificates_chunk <span class="kw">in
+            </span>migrated_certificates.chunks(migrated_certificates_chunk_size)
+        {
+            <span class="self">self</span>.certificate_repository
+            .create_many_certificates(migrated_certificates_chunk.to_owned())
             .<span class="kw">await
             </span>.with_context(|| {
                 <span class="string">&quot;Certificates Hash Migrator can not insert migrated certificates in the database&quot;
             </span>})<span class="question-mark">?</span>;
+        }
 
         <span class="prelude-val">Ok</span>((old_certificates, old_and_new_hashes))
     }

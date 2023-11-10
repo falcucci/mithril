@@ -835,7 +835,7 @@
     crypto_helper::{ProtocolGenesisVerifier, PROTOCOL_VERSION},
     entities::{
         Beacon, Certificate, CertificateMetadata, CertificateSignature, Epoch, ProtocolMessage,
-        SignedEntityType, SingleSignatures,
+        SignedEntityType, SingleSignatures, StakeDistributionParty,
     },
     StdResult,
 };
@@ -1180,7 +1180,7 @@
             epoch_service.current_protocol_parameters()<span class="question-mark">?</span>.clone(),
             initiated_at,
             sealed_at,
-            signers,
+            StakeDistributionParty::from_signers(signers),
         );
         <span class="kw">let </span>parent_certificate_hash = <span class="self">self
             </span>.certificate_repository

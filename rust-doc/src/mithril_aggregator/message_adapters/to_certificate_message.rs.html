@@ -57,11 +57,9 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>mithril_common::entities::{Certificate, CertificateSignature};
 <span class="kw">use </span>mithril_common::messages::{
-    CertificateMessage, CertificateMetadataMessagePart, SignerWithStakeMessagePart,
-    ToMessageAdapter,
+    CertificateMessage, CertificateMetadataMessagePart, ToMessageAdapter,
 };
 
 <span class="doccomment">/// Adapter to convert [Certificate] to [CertificateMessage] instances
@@ -75,7 +73,7 @@
             protocol_parameters: certificate.metadata.protocol_parameters,
             initiated_at: certificate.metadata.initiated_at,
             sealed_at: certificate.metadata.sealed_at,
-            signers: SignerWithStakeMessagePart::from_signers(certificate.metadata.signers),
+            signers: certificate.metadata.signers,
         };
 
         <span class="kw">let </span>(multi_signature, genesis_signature) = <span class="kw">match </span>certificate.signature {

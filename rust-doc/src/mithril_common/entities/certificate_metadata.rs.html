@@ -193,9 +193,82 @@
 <a href="#193" id="193">193</a>
 <a href="#194" id="194">194</a>
 <a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::entities::{ProtocolParameters, ProtocolVersion, SignerWithStake, StakeDistribution};
 <span class="kw">use </span>chrono::{DateTime, Utc};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>sha2::{Digest, Sha256};
+
+<span class="kw">use super</span>::{PartyId, Stake};
+
+<span class="doccomment">/// This represents a stake holder.
+</span><span class="attr">#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>StakeDistributionParty {
+    <span class="doccomment">/// Party identifier as in the stake distribution
+    </span><span class="kw">pub </span>party_id: PartyId,
+
+    <span class="doccomment">/// Amount of stake owned by the party.
+    </span><span class="kw">pub </span>stake: Stake,
+}
+
+<span class="kw">impl </span>From&lt;SignerWithStake&gt; <span class="kw">for </span>StakeDistributionParty {
+    <span class="kw">fn </span>from(value: SignerWithStake) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            party_id: value.party_id,
+            stake: value.stake,
+        }
+    }
+}
+
+<span class="kw">impl </span>StakeDistributionParty {
+    <span class="doccomment">/// As a sub structure of certificate, Party must be hashable.
+    </span><span class="kw">pub fn </span>compute_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = Sha256::new();
+        hasher.update(<span class="self">self</span>.party_id.as_bytes());
+        hasher.update(<span class="self">self</span>.stake.to_be_bytes());
+
+        hex::encode(hasher.finalize())
+    }
+
+    <span class="doccomment">/// Transform a list of signers into a list of `StakeDistributionParty``
+    </span><span class="kw">pub fn </span>from_signers(signers: Vec&lt;SignerWithStake&gt;) -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        signers.into_iter().map(|s| s.into()).collect()
+    }
+}
 
 <span class="doccomment">/// CertificateMetadata represents the metadata associated to a Certificate
 </span><span class="attr">#[derive(Clone, Debug, PartialEq, Default)]
@@ -221,7 +294,7 @@
 
     <span class="doccomment">/// The list of the active signers with their stakes and verification keys
     /// part of METADATA(p,n)
-    </span><span class="kw">pub </span>signers: Vec&lt;SignerWithStake&gt;,
+    </span><span class="kw">pub </span>signers: Vec&lt;StakeDistributionParty&gt;,
 }
 
 <span class="kw">impl </span>CertificateMetadata {
@@ -231,7 +304,7 @@
         protocol_parameters: ProtocolParameters,
         initiated_at: DateTime&lt;Utc&gt;,
         sealed_at: DateTime&lt;Utc&gt;,
-        signers: Vec&lt;SignerWithStake&gt;,
+        signers: Vec&lt;StakeDistributionParty&gt;,
     ) -&gt; CertificateMetadata {
         CertificateMetadata {
             protocol_version,
@@ -244,7 +317,11 @@
 
     <span class="doccomment">/// Deduce the stake distribution from the metadata [signers][CertificateMetadata::signers]
     </span><span class="kw">pub fn </span>get_stake_distribution(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StakeDistribution {
-        <span class="self">self</span>.signers.clone().iter().map(|s| s.into()).collect()
+        <span class="self">self</span>.signers
+            .clone()
+            .iter()
+            .map(|s| (s.party_id.clone(), s.stake))
+            .collect()
     }
 
     <span class="doccomment">/// Computes the hash of the certificate metadata
@@ -264,9 +341,11 @@
                 .unwrap_or_default()
                 .to_be_bytes(),
         );
-        <span class="self">self</span>.signers
-            .iter()
-            .for_each(|signer| hasher.update(signer.compute_hash().as_bytes()));
+
+        <span class="kw">for </span>party <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.signers {
+            hasher.update(party.compute_hash().as_bytes());
+        }
+
         hex::encode(hasher.finalize())
     }
 }
@@ -274,33 +353,24 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::test_utils::fake_keys;
     <span class="kw">use </span>chrono::{Duration, TimeZone, Timelike};
 
-    <span class="kw">fn </span>get_signers_with_stake() -&gt; Vec&lt;SignerWithStake&gt; {
+    <span class="kw">fn </span>get_parties() -&gt; Vec&lt;StakeDistributionParty&gt; {
         <span class="macro">vec!</span>[
-            SignerWithStake::new(
-                <span class="string">&quot;1&quot;</span>.to_string(),
-                fake_keys::signer_verification_key()[<span class="number">1</span>].try_into().unwrap(),
-                <span class="prelude-val">None</span>,
-                <span class="prelude-val">None</span>,
-                <span class="prelude-val">None</span>,
-                <span class="number">10</span>,
-            ),
-            SignerWithStake::new(
-                <span class="string">&quot;2&quot;</span>.to_string(),
-                fake_keys::signer_verification_key()[<span class="number">2</span>].try_into().unwrap(),
-                <span class="prelude-val">None</span>,
-                <span class="prelude-val">None</span>,
-                <span class="prelude-val">None</span>,
-                <span class="number">20</span>,
-            ),
+            StakeDistributionParty {
+                party_id: <span class="string">&quot;1&quot;</span>.to_string(),
+                stake: <span class="number">10</span>,
+            },
+            StakeDistributionParty {
+                party_id: <span class="string">&quot;2&quot;</span>.to_string(),
+                stake: <span class="number">20</span>,
+            },
         ]
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_certificate_metadata_compute_hash() {
-        <span class="kw">let </span>hash_expected = <span class="string">&quot;543a1890df395a128cbb4b18926a98bf255196cc46695ee8b2fbb615467f7c03&quot;</span>;
+        <span class="kw">let </span>hash_expected = <span class="string">&quot;11dd856403cc74ee6c307560b8b2393863299f79656bdabd0c4905aef621c688&quot;</span>;
 
         <span class="kw">let </span>initiated_at = Utc
             .with_ymd_and_hms(<span class="number">2024</span>, <span class="number">2</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">11</span>, <span class="number">47</span>)
@@ -316,7 +386,7 @@
                 ProtocolParameters::new(<span class="number">1000</span>, <span class="number">100</span>, <span class="number">0.123</span>),
                 initiated_at,
                 sealed_at,
-                get_signers_with_stake(),
+                get_parties(),
             )
             .compute_hash()
         );
@@ -328,7 +398,7 @@
                 ProtocolParameters::new(<span class="number">1000</span>, <span class="number">100</span>, <span class="number">0.123</span>),
                 initiated_at,
                 sealed_at,
-                get_signers_with_stake(),
+                get_parties(),
             )
             .compute_hash()
         );
@@ -340,7 +410,7 @@
                 ProtocolParameters::new(<span class="number">2000</span>, <span class="number">100</span>, <span class="number">0.123</span>),
                 initiated_at,
                 sealed_at,
-                get_signers_with_stake(),
+                get_parties(),
             )
             .compute_hash()
         );
@@ -352,12 +422,12 @@
                 ProtocolParameters::new(<span class="number">1000</span>, <span class="number">100</span>, <span class="number">0.123</span>),
                 initiated_at - Duration::seconds(<span class="number">78</span>),
                 sealed_at,
-                get_signers_with_stake(),
+                get_parties(),
             )
             .compute_hash()
         );
 
-        <span class="kw">let </span><span class="kw-2">mut </span>signers_with_different_party_id = get_signers_with_stake();
+        <span class="kw">let </span><span class="kw-2">mut </span>signers_with_different_party_id = get_parties();
         signers_with_different_party_id[<span class="number">0</span>].party_id = <span class="string">&quot;1-modified&quot;</span>.to_string();
 
         <span class="macro">assert_ne!</span>(
@@ -372,7 +442,7 @@
             .compute_hash()
         );
 
-        <span class="kw">let </span><span class="kw-2">mut </span>signers = get_signers_with_stake();
+        <span class="kw">let </span><span class="kw-2">mut </span>signers = get_parties();
         signers.truncate(<span class="number">1</span>);
 
         <span class="macro">assert_ne!</span>(
