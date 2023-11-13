@@ -352,6 +352,11 @@
 <a href="#352" id="352">352</a>
 <a href="#353" id="353">353</a>
 <a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::crypto_helper::{
     ProtocolAggregateVerificationKey, ProtocolGenesisSignature, ProtocolMultiSignature,
 };
@@ -471,6 +476,11 @@
     /// hash are equal).
     </span><span class="kw">pub fn </span>is_chaining_to_itself(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.hash == <span class="self">self</span>.previous_hash
+    }
+
+    <span class="doccomment">/// Check that the certificate signed message match the given protocol message.
+    </span><span class="kw">pub fn </span>match_message(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>ProtocolMessage) -&gt; bool {
+        message.compute_hash() == <span class="self">self</span>.signed_message
     }
 }
 

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CompressionAlgorithm"],"struct":["Beacon","Epoch","ProtocolGenesisVerifier","SnapshotListItemMessage","SnapshotMessage"],"trait":["CertificateVerifier"],"type":["MithrilStakeDistributionListMessage","ProtocolGenesisVerificationKey","SnapshotListMessage","StdError","StdResult"]};

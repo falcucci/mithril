@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["AggregatorHTTPClientError","SnapshotClientError"],"struct":["AggregatorHTTPClient","CertificateClient","MithrilStakeDistributionClient","SnapshotClient"],"trait":["AggregatorClient"]};
+window.SIDEBAR_ITEMS = {"enum":["AggregatorClientError","AggregatorRequest"],"struct":["AggregatorHTTPClient"],"trait":["AggregatorClient"]};
