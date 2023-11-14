@@ -105,12 +105,21 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     digesters::cache::{ImmutableFileDigestCacheProvider, JsonImmutableFileDigestCacheProvider},
     StdResult,
 };
 <span class="kw">use </span>anyhow::Context;
-<span class="kw">use </span>slog_scope::info;
+<span class="kw">use </span>slog::{info, Logger};
 <span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>tokio::fs;
 
@@ -120,6 +129,7 @@
     filename: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
     ensure_dir_exist: bool,
     reset_digests_cache: bool,
+    logger: Logger,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; JsonImmutableFileDigestCacheProviderBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -130,6 +140,7 @@
             filename,
             ensure_dir_exist: <span class="bool-val">false</span>,
             reset_digests_cache: <span class="bool-val">false</span>,
+            logger: Logger::root(slog::Discard, <span class="macro">slog::o!</span>()),
         }
     }
 
@@ -142,6 +153,12 @@
     <span class="doccomment">/// Set if existing cached values in the provider must be reset.
     </span><span class="kw">pub fn </span>should_reset_digests_cache(<span class="kw-2">&amp;mut </span><span class="self">self</span>, should_reset: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.reset_digests_cache = should_reset;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the [Logger] to use.
+    </span><span class="kw">pub fn </span>with_logger(<span class="kw-2">&amp;mut </span><span class="self">self</span>, logger: Logger) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.logger = logger;
         <span class="self">self
     </span>}
 
@@ -169,6 +186,7 @@
         }
 
         <span class="macro">info!</span>(
+            <span class="self">self</span>.logger,
             <span class="string">&quot;Storing/Getting immutables digests cache from: {}&quot;</span>,
             cache_file.display()
         );

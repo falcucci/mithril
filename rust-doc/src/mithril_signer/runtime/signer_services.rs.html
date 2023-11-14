@@ -364,6 +364,7 @@
 <a href="#364" id="364">364</a>
 <a href="#365" id="365">365</a>
 <a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>sqlite::{Connection, ConnectionWithFullMutex};
@@ -496,6 +497,7 @@
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;immutables_digests_{}.json&quot;</span>, <span class="self">self</span>.config.network),
         )
         .should_reset_digests_cache(<span class="self">self</span>.config.reset_digests_cache)
+        .with_logger(slog_scope::logger())
         .build()
         .<span class="kw">await</span><span class="question-mark">?</span>;
 

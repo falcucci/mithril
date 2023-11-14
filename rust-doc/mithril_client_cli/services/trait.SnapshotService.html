@@ -14,7 +14,7 @@
              'life1: 'async_trait</span>;
 <span class="item-spacer"></span>    fn <a href="#tymethod.download" class="fn">download</a>&lt;'life0, 'life1, 'life2, 'life3, 'async_trait&gt;(
         &amp;'life0 self,
-        snapshot_entity: &amp;'life1 <a class="struct" href="../../mithril_common/entities/signed_entity/struct.SignedEntity.html" title="struct mithril_common::entities::signed_entity::SignedEntity">SignedEntity</a>&lt;<a class="struct" href="../../mithril_common/entities/snapshot/struct.Snapshot.html" title="struct mithril_common::entities::snapshot::Snapshot">Snapshot</a>&gt;,
+        snapshot_entity: &amp;'life1 SignedEntity&lt;Snapshot&gt;,
         pathdir: &amp;'life2 <a class="struct" href="https://doc.rust-lang.org/1.73.0/std/path/struct.Path.html" title="struct std::path::Path">Path</a>,
         genesis_verification_key: &amp;'life3 <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.str.html">str</a>,
         progress_output_type: <a class="enum" href="../utils/enum.ProgressOutputType.html" title="enum mithril_client_cli::utils::ProgressOutputType">ProgressOutputType</a>
@@ -40,7 +40,7 @@
     'life1: 'async_trait,</span></h4></section></summary><div class="docblock"><p>Show details of the snapshot identified by the given digest.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="tymethod.download" class="method"><a class="src rightside" href="../../src/mithril_client_cli/services/snapshot.rs.html#96-102">source</a><h4 class="code-header">fn <a href="#tymethod.download" class="fn">download</a>&lt;'life0, 'life1, 'life2, 'life3, 'async_trait&gt;(
     &amp;'life0 self,
-    snapshot_entity: &amp;'life1 <a class="struct" href="../../mithril_common/entities/signed_entity/struct.SignedEntity.html" title="struct mithril_common::entities::signed_entity::SignedEntity">SignedEntity</a>&lt;<a class="struct" href="../../mithril_common/entities/snapshot/struct.Snapshot.html" title="struct mithril_common::entities::snapshot::Snapshot">Snapshot</a>&gt;,
+    snapshot_entity: &amp;'life1 SignedEntity&lt;Snapshot&gt;,
     pathdir: &amp;'life2 <a class="struct" href="https://doc.rust-lang.org/1.73.0/std/path/struct.Path.html" title="struct std::path::Path">Path</a>,
     genesis_verification_key: &amp;'life3 <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.str.html">str</a>,
     progress_output_type: <a class="enum" href="../utils/enum.ProgressOutputType.html" title="enum mithril_client_cli::utils::ProgressOutputType">ProgressOutputType</a>

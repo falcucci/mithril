@@ -15,6 +15,8 @@
 <a href="#15" id="15">15</a>
 <a href="#16" id="16">16</a>
 <a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Test utilities
 //!
 //! They contains:
@@ -23,12 +25,14 @@
 //! * A builder of [MithrilFixture] to generate signers alongside a stake distribution
 //!
 
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;apispec&quot;</span>)]
 </span><span class="kw">pub mod </span>apispec;
 <span class="kw">pub mod </span>fake_data;
 <span class="kw">pub mod </span>fake_keys;
 <span class="kw">mod </span>fixture_builder;
 <span class="kw">mod </span>mithril_fixture;
-<span class="kw">pub mod </span>test_http_server;
+<span class="attr">#[cfg(feature = <span class="string">&quot;test_http_server&quot;</span>)]
+</span><span class="kw">pub mod </span>test_http_server;
 
 <span class="kw">pub use </span>fixture_builder::{MithrilFixtureBuilder, StakeDistributionGenerationMethod};
 <span class="kw">pub use </span>mithril_fixture::{MithrilFixture, SignerFixture};

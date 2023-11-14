@@ -1197,6 +1197,7 @@
 <a href="#1197" id="1197">1197</a>
 <a href="#1198" id="1198">1198</a>
 <a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>anyhow::Context;
@@ -1733,6 +1734,7 @@
             <span class="kw-2">&amp;</span><span class="self">self</span>.configuration.data_stores_directory,
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;immutables_digests_{}.json&quot;</span>, <span class="self">self</span>.configuration.network),
         )
+        .with_logger(<span class="self">self</span>.get_logger().<span class="kw">await</span><span class="question-mark">?</span>)
         .should_reset_digests_cache(<span class="self">self</span>.configuration.reset_digests_cache)
         .build()
         .<span class="kw">await</span><span class="question-mark">?</span>;

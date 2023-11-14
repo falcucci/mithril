@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ChainObserverError","TxDatumError","TxDatumFieldTypeName","TxDatumFieldValue"],"struct":["CardanoCliChainObserver","CardanoCliRunner","FakeObserver","MockChainObserver","TxDatum","TxDatumBuilder"],"trait":["ChainObserver"],"type":["ChainAddress"]};
+window.SIDEBAR_ITEMS = {"enum":["ChainObserverError","TxDatumError","TxDatumFieldTypeName","TxDatumFieldValue"],"struct":["CardanoCliChainObserver","CardanoCliRunner","FakeObserver","TxDatum","TxDatumBuilder"],"trait":["ChainObserver"],"type":["ChainAddress"]};

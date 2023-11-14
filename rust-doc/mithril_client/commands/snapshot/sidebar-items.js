@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["SnapshotCommands"],"mod":["download","list","show"]};
