@@ -254,6 +254,9 @@
 <a href="#254" id="254">254</a>
 <a href="#255" id="255">255</a>
 <a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>sqlite::ConnectionWithFullMutex;
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>tokio::sync::RwLock;
@@ -272,7 +275,7 @@
     BeaconProvider,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::services::EpochService;
+<span class="kw">use </span><span class="kw">crate</span>::services::{EpochService, HttpMessageService};
 <span class="kw">use crate</span>::{
     configuration::<span class="kw-2">*</span>,
     database::provider::{CertificateRepository, SignedEntityStorer, SignerGetter, StakePoolStore},
@@ -388,6 +391,9 @@
 
     <span class="doccomment">/// Signer getter service
     </span><span class="kw">pub </span>signer_getter: Arc&lt;<span class="kw">dyn </span>SignerGetter&gt;,
+
+    <span class="doccomment">/// HTTP message service
+    </span><span class="kw">pub </span>http_message_service: Arc&lt;<span class="kw">dyn </span>HttpMessageService&gt;,
 }
 
 <span class="attr">#[doc(hidden)]

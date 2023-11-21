@@ -346,14 +346,6 @@
 <a href="#346" id="346">346</a>
 <a href="#347" id="347">347</a>
 <a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::http_server::routes::middlewares;
 <span class="kw">use </span><span class="kw">crate</span>::DependencyContainer;
 <span class="kw">use </span>std::sync::Arc;
@@ -385,7 +377,7 @@
 ) -&gt; <span class="kw">impl </span>Filter&lt;Extract = (<span class="kw">impl </span>warp::Reply,), Error = warp::Rejection&gt; + Clone {
     <span class="macro">warp::path!</span>(<span class="string">&quot;certificates&quot;</span>)
         .and(warp::get())
-        .and(middlewares::with_certifier_service(dependency_manager))
+        .and(middlewares::with_http_message_service(dependency_manager))
         .and_then(handlers::certificate_certificates)
 }
 
@@ -395,16 +387,14 @@
 ) -&gt; <span class="kw">impl </span>Filter&lt;Extract = (<span class="kw">impl </span>warp::Reply,), Error = warp::Rejection&gt; + Clone {
     <span class="macro">warp::path!</span>(<span class="string">&quot;certificate&quot; </span>/ String)
         .and(warp::get())
-        .and(middlewares::with_certifier_service(dependency_manager))
+        .and(middlewares::with_http_message_service(dependency_manager))
         .and_then(handlers::certificate_certificate_hash)
 }
 
 <span class="kw">mod </span>handlers {
     <span class="kw">use crate</span>::{
-        http_server::routes::reply,
-        message_adapters::{ToCertificateListMessageAdapter, ToCertificateMessageAdapter},
-        services::CertifierService,
-        CertificatePendingStore, ToCertificatePendingMessageAdapter,
+        http_server::routes::reply, services::HttpMessageService, CertificatePendingStore,
+        ToCertificatePendingMessageAdapter,
     };
 
     <span class="kw">use </span>mithril_common::messages::ToMessageAdapter;
@@ -436,18 +426,15 @@
 
     <span class="doccomment">/// List all Certificates
     </span><span class="kw">pub async fn </span>certificate_certificates(
-        certifier_service: Arc&lt;<span class="kw">dyn </span>CertifierService&gt;,
+        http_message_service: Arc&lt;<span class="kw">dyn </span>HttpMessageService&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">impl </span>warp::Reply, Infallible&gt; {
         <span class="macro">debug!</span>(<span class="string">&quot;⇄ HTTP SERVER: certificate_certificates&quot;</span>,);
 
-        <span class="kw">match </span>certifier_service
-            .get_latest_certificates(LIST_MAX_ITEMS)
+        <span class="kw">match </span>http_message_service
+            .get_last_certificates(LIST_MAX_ITEMS)
             .<span class="kw">await
         </span>{
-            <span class="prelude-val">Ok</span>(certificates) =&gt; <span class="prelude-val">Ok</span>(reply::json(
-                <span class="kw-2">&amp;</span>ToCertificateListMessageAdapter::adapt(certificates),
-                StatusCode::OK,
-            )),
+            <span class="prelude-val">Ok</span>(certificates) =&gt; <span class="prelude-val">Ok</span>(reply::json(<span class="kw-2">&amp;</span>certificates, StatusCode::OK)),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="macro">warn!</span>(<span class="string">&quot;certificate_certificates::error&quot;</span>; <span class="string">&quot;error&quot; </span>=&gt; <span class="question-mark">?</span>err);
                 <span class="prelude-val">Ok</span>(reply::internal_server_error(err))
@@ -458,21 +445,18 @@
     <span class="doccomment">/// Certificate by certificate hash
     </span><span class="kw">pub async fn </span>certificate_certificate_hash(
         certificate_hash: String,
-        certifier_service: Arc&lt;<span class="kw">dyn </span>CertifierService&gt;,
+        http_message_service: Arc&lt;<span class="kw">dyn </span>HttpMessageService&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">impl </span>warp::Reply, Infallible&gt; {
         <span class="macro">debug!</span>(
             <span class="string">&quot;⇄ HTTP SERVER: certificate_certificate_hash/{}&quot;</span>,
             certificate_hash
         );
 
-        <span class="kw">match </span>certifier_service
-            .get_certificate_by_hash(<span class="kw-2">&amp;</span>certificate_hash)
+        <span class="kw">match </span>http_message_service
+            .get_certificate(<span class="kw-2">&amp;</span>certificate_hash)
             .<span class="kw">await
         </span>{
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(certificate)) =&gt; <span class="prelude-val">Ok</span>(reply::json(
-                <span class="kw-2">&amp;</span>ToCertificateMessageAdapter::adapt(certificate),
-                StatusCode::OK,
-            )),
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(certificate)) =&gt; <span class="prelude-val">Ok</span>(reply::json(<span class="kw-2">&amp;</span>certificate, StatusCode::OK)),
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(reply::empty(StatusCode::NOT_FOUND)),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="macro">warn!</span>(<span class="string">&quot;certificate_certificate_hash::error&quot;</span>; <span class="string">&quot;error&quot; </span>=&gt; <span class="question-mark">?</span>err);

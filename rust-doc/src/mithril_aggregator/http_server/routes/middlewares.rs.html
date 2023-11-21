@@ -95,11 +95,18 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     database::provider::SignerGetter,
     dependency_injection::EpochServiceWrapper,
     event_store::{EventMessage, TransmitterService},
-    services::{CertifierService, SignedEntityService, TickerService},
+    services::{CertifierService, HttpMessageService, SignedEntityService, TickerService},
     CertificatePendingStore, Configuration, DependencyContainer, SignerRegisterer,
     VerificationKeyStorer,
 };
@@ -191,5 +198,12 @@
     dependency_manager: Arc&lt;DependencyContainer&gt;,
 ) -&gt; <span class="kw">impl </span>Filter&lt;Extract = (Arc&lt;APIVersionProvider&gt;,), Error = Infallible&gt; + Clone {
     warp::any().map(<span class="kw">move </span>|| dependency_manager.api_version_provider.clone())
+}
+
+<span class="doccomment">/// With Message service
+</span><span class="kw">pub fn </span>with_http_message_service(
+    dependency_manager: Arc&lt;DependencyContainer&gt;,
+) -&gt; <span class="kw">impl </span>Filter&lt;Extract = (Arc&lt;<span class="kw">dyn </span>HttpMessageService&gt;,), Error = Infallible&gt; + Clone {
+    warp::any().map(<span class="kw">move </span>|| dependency_manager.http_message_service.clone())
 }
 </code></pre></div></section></main></body></html>

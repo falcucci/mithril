@@ -609,6 +609,8 @@
 <a href="#609" id="609">609</a>
 <a href="#610" id="610">610</a>
 <a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::database::provider::{CertificateRepository, SignedEntityStorer};
 <span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>mithril_common::{entities::Certificate, StdResult};
@@ -657,7 +659,7 @@
         <span class="kw">let </span>old_certificates = <span class="self">self
             </span>.certificate_repository
             <span class="comment">// arbitrary high value to get all existing certificates
-            </span>.get_latest_certificates(usize::MAX)
+            </span>.get_latest_certificates::&lt;Certificate&gt;(usize::MAX)
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>certificates_to_remove = <span class="macro">vec!</span>[];
 
@@ -864,7 +866,8 @@
         connection: Arc&lt;ConnectionWithFullMutex&gt;,
         certificates_and_signed_entity: <span class="kw-2">&amp;</span>[(Certificate, <span class="prelude-ty">Option</span>&lt;SignedEntityTypeDiscriminants&gt;)],
     ) -&gt; StdResult&lt;Vec&lt;(Certificate, <span class="prelude-ty">Option</span>&lt;SignedEntityRecord&gt;)&gt;&gt; {
-        <span class="kw">let </span>certificate_repository = CertificateRepository::new(connection.clone());
+        <span class="kw">let </span>certificate_repository: CertificateRepository =
+            CertificateRepository::new(connection.clone());
         <span class="kw">let </span>signed_entity_store = SignedEntityStoreAdapter::new(connection.clone());
         <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[];
 
@@ -1027,11 +1030,12 @@
         connection: Arc&lt;ConnectionWithFullMutex&gt;,
     ) -&gt; StdResult&lt;Vec&lt;(Certificate, <span class="prelude-ty">Option</span>&lt;SignedEntityRecord&gt;)&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[];
-        <span class="kw">let </span>certificate_repository = CertificateRepository::new(connection.clone());
+        <span class="kw">let </span>certificate_repository: CertificateRepository =
+            CertificateRepository::new(connection.clone());
         <span class="kw">let </span>signed_entity_store = SignedEntityStoreAdapter::new(connection.clone());
 
         <span class="kw">let </span>certificates = certificate_repository
-            .get_latest_certificates(usize::MAX)
+            .get_latest_certificates::&lt;Certificate&gt;(usize::MAX)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for </span>certificate <span class="kw">in </span>certificates {

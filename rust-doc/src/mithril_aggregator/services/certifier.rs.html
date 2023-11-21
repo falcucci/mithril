@@ -1184,7 +1184,7 @@
         );
         <span class="kw">let </span>parent_certificate_hash = <span class="self">self
             </span>.certificate_repository
-            .get_master_certificate_for_epoch(open_message.epoch)
+            .get_master_certificate_for_epoch::&lt;Certificate&gt;(open_message.epoch)
             .<span class="kw">await
             </span>.with_context(|| {
                 <span class="macro">format!</span>(
@@ -1247,7 +1247,7 @@
     <span class="kw">async fn </span>verify_certificate_chain(<span class="kw-2">&amp;</span><span class="self">self</span>, epoch: Epoch) -&gt; StdResult&lt;()&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(certificate) = <span class="self">self
             </span>.certificate_repository
-            .get_latest_certificates(<span class="number">1</span>)
+            .get_latest_certificates::&lt;Certificate&gt;(<span class="number">1</span>)
             .<span class="kw">await</span><span class="question-mark">?
             </span>.first()
         {
