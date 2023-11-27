@@ -110,20 +110,35 @@
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::Context;
-<span class="kw">use </span>mithril_common::digesters::{CardanoImmutableDigester, ImmutableDigester};
+<span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+</span><span class="kw">use </span>mithril_common::digesters::{CardanoImmutableDigester, ImmutableDigester};
 <span class="kw">use </span>mithril_common::entities::{ProtocolMessage, ProtocolMessagePartKey};
 <span class="kw">use </span>mithril_common::messages::SignerWithStakeMessagePart;
 <span class="kw">use </span>mithril_common::protocol::SignerBuilder;
 <span class="kw">use </span>slog::{o, Logger};
-<span class="kw">use </span>std::path::Path;
-<span class="kw">use </span>std::sync::Arc;
+<span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+</span><span class="kw">use </span>std::path::Path;
+<span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+</span><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use crate</span>::{MithrilCertificate, MithrilResult, MithrilStakeDistribution};
+<span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::MithrilCertificate;
+<span class="kw">use crate</span>::{MithrilResult, MithrilStakeDistribution};
 
 <span class="doccomment">/// A [MessageBuilder] can be used to compute the message of Mithril artifacts.
 </span><span class="kw">pub struct </span>MessageBuilder {
-    immutable_digester: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>ImmutableDigester&gt;&gt;,
+    <span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+    </span>immutable_digester: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>ImmutableDigester&gt;&gt;,
     logger: Logger,
 }
 
@@ -132,8 +147,23 @@
     </span><span class="kw">pub fn </span>new() -&gt; MessageBuilder {
         <span class="kw">let </span>logger = Logger::root(slog::Discard, <span class="macro">o!</span>());
         <span class="self">Self </span>{
-            immutable_digester: <span class="prelude-val">None</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+            </span>immutable_digester: <span class="prelude-val">None</span>,
             logger,
+        }
+    }
+
+    <span class="doccomment">/// Set the [Logger] to use.
+    </span><span class="kw">pub fn </span>with_logger(<span class="kw-2">mut </span><span class="self">self</span>, logger: Logger) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.logger = logger;
+        <span class="self">self
+    </span>}
+
+    <span class="macro">cfg_fs! </span>{
+    <span class="kw">fn </span>get_immutable_digester(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Arc&lt;<span class="kw">dyn </span>ImmutableDigester&gt; {
+        <span class="kw">match </span><span class="self">self</span>.immutable_digester.as_ref() {
+            <span class="prelude-val">None </span>=&gt; Arc::new(CardanoImmutableDigester::new(<span class="prelude-val">None</span>, <span class="self">self</span>.logger.clone())),
+            <span class="prelude-val">Some</span>(digester) =&gt; digester.clone(),
         }
     }
 
@@ -147,19 +177,6 @@
         <span class="self">self</span>.immutable_digester = <span class="prelude-val">Some</span>(immutable_digester);
         <span class="self">self
     </span>}
-
-    <span class="doccomment">/// Set the [Logger] to use.
-    </span><span class="kw">pub fn </span>with_logger(<span class="kw-2">mut </span><span class="self">self</span>, logger: Logger) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.logger = logger;
-        <span class="self">self
-    </span>}
-
-    <span class="kw">fn </span>get_immutable_digester(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Arc&lt;<span class="kw">dyn </span>ImmutableDigester&gt; {
-        <span class="kw">match </span><span class="self">self</span>.immutable_digester.as_ref() {
-            <span class="prelude-val">None </span>=&gt; Arc::new(CardanoImmutableDigester::new(<span class="prelude-val">None</span>, <span class="self">self</span>.logger.clone())),
-            <span class="prelude-val">Some</span>(digester) =&gt; digester.clone(),
-        }
-    }
 
     <span class="doccomment">/// Compute message for a snapshot (based on the directory where it was unpacked).
     ///
@@ -185,6 +202,7 @@
         message.set_message_part(ProtocolMessagePartKey::SnapshotDigest, digest);
 
         <span class="prelude-val">Ok</span>(message)
+    }
     }
 
     <span class="doccomment">/// Compute message for a Mithril stake distribution.

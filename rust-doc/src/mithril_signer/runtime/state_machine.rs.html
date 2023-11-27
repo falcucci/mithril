@@ -831,8 +831,8 @@
 <a href="#831" id="831">831</a>
 <a href="#832" id="832">832</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>slog_scope::{crit, debug, error, info};
-<span class="kw">use </span>std::{fmt::Display, time::Duration};
-<span class="kw">use </span>tokio::time::sleep;
+<span class="kw">use </span>std::{fmt::Display, ops::Deref, time::Duration};
+<span class="kw">use </span>tokio::{sync::Mutex, time::sleep};
 
 <span class="kw">use </span>mithril_common::{
     crypto_helper::ProtocolInitializerError,
@@ -844,7 +844,7 @@
 <span class="kw">use super</span>::{Runner, RuntimeError};
 
 <span class="doccomment">/// Different possible states of the state machine.
-</span><span class="attr">#[derive(Debug, PartialEq, Eq)]
+</span><span class="attr">#[derive(Debug, Clone, PartialEq, Eq)]
 </span><span class="kw">pub enum </span>SignerState {
     <span class="doccomment">/// Starting state
     </span>Init,
@@ -917,7 +917,7 @@
 
 <span class="doccomment">/// The state machine is responsible of the execution of the signer automate.
 </span><span class="kw">pub struct </span>StateMachine {
-    state: SignerState,
+    state: Mutex&lt;SignerState&gt;,
     runner: Box&lt;<span class="kw">dyn </span>Runner&gt;,
     state_sleep: Duration,
 }
@@ -930,19 +930,19 @@
         state_sleep: Duration,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            state: starting_state,
+            state: Mutex::new(starting_state),
             runner,
             state_sleep,
         }
     }
 
     <span class="doccomment">/// Return the current state of the state machine.
-    </span><span class="kw">pub fn </span>get_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SignerState {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.state
+    </span><span class="kw">pub async fn </span>get_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignerState {
+        <span class="self">self</span>.state.lock().<span class="kw">await</span>.to_owned()
     }
 
     <span class="doccomment">/// Launch the state machine until an error occurs or it is interrupted.
-    </span><span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), RuntimeError&gt; {
+    </span><span class="kw">pub async fn </span>run(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), RuntimeError&gt; {
         <span class="macro">info!</span>(<span class="string">&quot;STATE MACHINE: launching&quot;</span>);
 
         <span class="kw">loop </span>{
@@ -965,18 +965,19 @@
     }
 
     <span class="doccomment">/// Perform a cycle of the state machine.
-    </span><span class="kw">pub async fn </span>cycle(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), RuntimeError&gt; {
+    </span><span class="kw">pub async fn </span>cycle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), RuntimeError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state.lock().<span class="kw">await</span>;
         <span class="macro">info!</span>(<span class="string">&quot;================================================================================&quot;</span>);
-        <span class="macro">info!</span>(<span class="string">&quot;STATE MACHINE: new cycle: {}&quot;</span>, <span class="self">self</span>.state);
+        <span class="macro">info!</span>(<span class="string">&quot;STATE MACHINE: new cycle: {}&quot;</span>, <span class="kw-2">*</span>state);
 
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.state {
+        <span class="kw">match </span>state.deref() {
             SignerState::Init =&gt; {
-                <span class="self">self</span>.state = <span class="self">self</span>.transition_from_init_to_unregistered().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw-2">*</span>state = <span class="self">self</span>.transition_from_init_to_unregistered().<span class="kw">await</span><span class="question-mark">?</span>;
             }
             SignerState::Unregistered { epoch } =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(new_beacon) = <span class="self">self</span>.has_epoch_changed(<span class="kw-2">*</span>epoch).<span class="kw">await</span><span class="question-mark">? </span>{
                     <span class="macro">info!</span>(<span class="string">&quot;→ Epoch has changed, transiting to UNREGISTERED&quot;</span>);
-                    <span class="self">self</span>.state = <span class="self">self
+                    <span class="kw-2">*</span>state = <span class="self">self
                         </span>.transition_from_unregistered_to_unregistered(new_beacon)
                         .<span class="kw">await</span><span class="question-mark">?</span>;
                 } <span class="kw">else if let </span><span class="prelude-val">Some</span>(epoch_settings) = <span class="self">self
@@ -992,7 +993,7 @@
                     <span class="kw">if </span>epoch_settings.epoch &gt;= <span class="kw-2">*</span>epoch {
                         <span class="macro">info!</span>(<span class="string">&quot;new Epoch found&quot;</span>);
                         <span class="macro">info!</span>(<span class="string">&quot; ⋅ transiting to REGISTERED&quot;</span>);
-                        <span class="self">self</span>.state = <span class="self">self
+                        <span class="kw-2">*</span>state = <span class="self">self
                             </span>.transition_from_unregistered_to_registered(<span class="kw-2">&amp;</span>epoch_settings)
                             .<span class="kw">await</span><span class="question-mark">?</span>;
                     } <span class="kw">else </span>{
@@ -1009,7 +1010,7 @@
             SignerState::Registered { epoch } =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(new_epoch) = <span class="self">self</span>.has_epoch_changed(<span class="kw-2">*</span>epoch).<span class="kw">await</span><span class="question-mark">? </span>{
                     <span class="macro">info!</span>(<span class="string">&quot;→ Epoch has changed, transiting to UNREGISTERED&quot;</span>);
-                    <span class="self">self</span>.state = <span class="self">self
+                    <span class="kw-2">*</span>state = <span class="self">self
                         </span>.transition_from_registered_to_unregistered(new_epoch)
                         .<span class="kw">await</span><span class="question-mark">?</span>;
                 } <span class="kw">else if let </span><span class="prelude-val">Some</span>(pending_certificate) =
@@ -1035,7 +1036,7 @@
                         })<span class="question-mark">?
                     </span>{
                         <span class="macro">info!</span>(<span class="string">&quot; → we can sign this certificate, transiting to SIGNED&quot;</span>);
-                        <span class="self">self</span>.state = <span class="self">self
+                        <span class="kw-2">*</span>state = <span class="self">self
                             </span>.transition_from_registered_to_signed(<span class="kw-2">&amp;</span>pending_certificate)
                             .<span class="kw">await</span><span class="question-mark">?</span>;
                     } <span class="kw">else </span>{
@@ -1051,7 +1052,7 @@
             } =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(new_epoch) = <span class="self">self</span>.has_epoch_changed(<span class="kw-2">*</span>epoch).<span class="kw">await</span><span class="question-mark">? </span>{
                     <span class="macro">info!</span>(<span class="string">&quot; → new Epoch detected, transiting to UNREGISTERED&quot;</span>);
-                    <span class="self">self</span>.state = <span class="self">self
+                    <span class="kw-2">*</span>state = <span class="self">self
                         </span>.transition_from_signed_to_unregistered(new_epoch)
                         .<span class="kw">await</span><span class="question-mark">?</span>;
                 } <span class="kw">else if let </span><span class="prelude-val">Some</span>(pending_certificate) =
@@ -1070,7 +1071,7 @@
                         <span class="macro">info!</span>(<span class="string">&quot; ⋅ pending certificate has not changed, waiting…&quot;</span>);
                     } <span class="kw">else </span>{
                         <span class="macro">info!</span>(<span class="string">&quot; → new pending certificate detected, transiting to REGISTERED&quot;</span>);
-                        <span class="self">self</span>.state = <span class="self">self</span>.transition_from_signed_to_registered(<span class="kw-2">*</span>epoch).<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="kw-2">*</span>state = <span class="self">self</span>.transition_from_signed_to_registered(<span class="kw-2">*</span>epoch).<span class="kw">await</span><span class="question-mark">?</span>;
                     }
                 } <span class="kw">else </span>{
                     <span class="macro">info!</span>(<span class="string">&quot; ⋅ no pending certificate, waiting…&quot;</span>);
@@ -1269,7 +1270,7 @@
 
     <span class="kw">fn </span>init_state_machine(init_state: SignerState, runner: MockSignerRunner) -&gt; StateMachine {
         StateMachine {
-            state: init_state,
+            state: init_state.into(),
             runner: Box::new(runner),
             state_sleep: Duration::from_millis(<span class="number">100</span>),
         }
@@ -1286,7 +1287,7 @@
             .expect_get_current_beacon()
             .once()
             .returning(|| <span class="prelude-val">Ok</span>(fake_data::beacon()));
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine = init_state_machine(
+        <span class="kw">let </span>state_machine = init_state_machine(
             SignerState::Unregistered {
                 epoch: fake_data::beacon().epoch,
             },
@@ -1298,11 +1299,11 @@
             </span>.expect(<span class="string">&quot;Cycling the state machine should not fail&quot;</span>);
 
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span>SignerState::Unregistered {
+            SignerState::Unregistered {
                 epoch: fake_data::beacon().epoch
             },
-            state_machine.get_state()
-        );
+            state_machine.get_state().<span class="kw">await
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1323,7 +1324,7 @@
             beacon.epoch = Epoch(<span class="number">4</span>);
             <span class="prelude-val">Ok</span>(beacon)
         });
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine =
+        <span class="kw">let </span>state_machine =
             init_state_machine(SignerState::Unregistered { epoch: known_epoch }, runner);
         state_machine
             .cycle()
@@ -1331,9 +1332,9 @@
             </span>.expect(<span class="string">&quot;Cycling the state machine should not fail&quot;</span>);
 
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span>SignerState::Unregistered { epoch: known_epoch },
-            state_machine.get_state()
-        );
+            SignerState::Unregistered { epoch: known_epoch },
+            state_machine.get_state().<span class="kw">await
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1356,7 +1357,7 @@
             .once()
             .returning(|<span class="kw">_</span>, <span class="kw">_</span>| <span class="prelude-val">Ok</span>(()));
 
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine = init_state_machine(
+        <span class="kw">let </span>state_machine = init_state_machine(
             SignerState::Unregistered {
                 epoch: fake_data::beacon().epoch,
             },
@@ -1368,12 +1369,12 @@
             .<span class="kw">await
             </span>.expect(<span class="string">&quot;Cycling the state machine should not fail&quot;</span>);
 
-        <span class="kw">if let </span>SignerState::Registered { epoch: <span class="kw">_ </span>} = state_machine.get_state() {
+        <span class="kw">if let </span>SignerState::Registered { epoch: <span class="kw">_ </span>} = state_machine.get_state().<span class="kw">await </span>{
         } <span class="kw">else </span>{
             <span class="macro">panic!</span>(
                 <span class="string">&quot;state machine did not return a RegisteredState but {:?}&quot;</span>,
-                state_machine.get_state()
-            );
+                state_machine.get_state().<span class="kw">await
+            </span>);
         }
     }
 
@@ -1389,19 +1390,18 @@
             .once()
             .returning(|_e: Epoch| <span class="prelude-val">Ok</span>(()));
 
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine =
-            init_state_machine(SignerState::Registered { epoch: Epoch(<span class="number">0</span>) }, runner);
+        <span class="kw">let </span>state_machine = init_state_machine(SignerState::Registered { epoch: Epoch(<span class="number">0</span>) }, runner);
 
         state_machine
             .cycle()
             .<span class="kw">await
             </span>.expect(<span class="string">&quot;Cycling the state machine should not fail&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span>SignerState::Unregistered {
+            SignerState::Unregistered {
                 epoch: fake_data::beacon().epoch
             },
-            state_machine.get_state()
-        );
+            state_machine.get_state().<span class="kw">await
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1428,7 +1428,7 @@
             .returning(<span class="kw">move </span>|| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(certificate_pending.to_owned())));
         runner.expect_can_i_sign().once().returning(|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>));
 
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine = init_state_machine(state, runner);
+        <span class="kw">let </span>state_machine = init_state_machine(state, runner);
         state_machine
             .cycle()
             .<span class="kw">await
@@ -1436,10 +1436,10 @@
 
         <span class="macro">assert_eq!</span>(
             SignerState::Registered { epoch: Epoch(<span class="number">9</span>) },
-            <span class="kw-2">*</span>state_machine.get_state(),
+            state_machine.get_state().<span class="kw">await</span>,
             <span class="string">&quot;state machine did not return a RegisteredState but {:?}&quot;</span>,
-            state_machine.get_state()
-        );
+            state_machine.get_state().<span class="kw">await
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1483,7 +1483,7 @@
             .once()
             .returning(|<span class="kw">_</span>, <span class="kw">_</span>| <span class="prelude-val">Ok</span>(()));
 
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine = init_state_machine(state, runner);
+        <span class="kw">let </span>state_machine = init_state_machine(state, runner);
         state_machine
             .cycle()
             .<span class="kw">await
@@ -1494,10 +1494,10 @@
                 epoch: Epoch(<span class="number">9</span>),
                 signed_entity_type
             },
-            <span class="kw-2">*</span>state_machine.get_state(),
+            state_machine.get_state().<span class="kw">await</span>,
             <span class="string">&quot;state machine did not return a RegisteredState but {:?}&quot;</span>,
-            state_machine.get_state()
-        );
+            state_machine.get_state().<span class="kw">await
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1528,7 +1528,7 @@
             .once()
             .returning(<span class="kw">move </span>|| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(certificate_pending.clone())));
 
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine = init_state_machine(state, runner);
+        <span class="kw">let </span>state_machine = init_state_machine(state, runner);
         state_machine
             .cycle()
             .<span class="kw">await
@@ -1538,8 +1538,8 @@
             SignerState::Registered {
                 epoch: beacon.epoch
             },
-            <span class="kw-2">*</span>state_machine.get_state()
-        );
+            state_machine.get_state().<span class="kw">await
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1568,7 +1568,7 @@
             .once()
             .returning(|_e: Epoch| <span class="prelude-val">Ok</span>(()));
 
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine = init_state_machine(state, runner);
+        <span class="kw">let </span>state_machine = init_state_machine(state, runner);
         state_machine
             .cycle()
             .<span class="kw">await
@@ -1576,8 +1576,8 @@
 
         <span class="macro">assert_eq!</span>(
             SignerState::Unregistered { epoch: Epoch(<span class="number">10</span>) },
-            <span class="kw-2">*</span>state_machine.get_state()
-        );
+            state_machine.get_state().<span class="kw">await
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1606,7 +1606,7 @@
             .once()
             .returning(<span class="kw">move </span>|| <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>));
 
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine = init_state_machine(state, runner);
+        <span class="kw">let </span>state_machine = init_state_machine(state, runner);
         state_machine
             .cycle()
             .<span class="kw">await
@@ -1617,8 +1617,8 @@
                 epoch: beacon.epoch,
                 signed_entity_type: SignedEntityType::dummy(),
             },
-            <span class="kw-2">*</span>state_machine.get_state()
-        );
+            state_machine.get_state().<span class="kw">await
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1647,7 +1647,7 @@
             .once()
             .returning(<span class="kw">move </span>|| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(certificate_pending.clone())));
 
-        <span class="kw">let </span><span class="kw-2">mut </span>state_machine = init_state_machine(state, runner);
+        <span class="kw">let </span>state_machine = init_state_machine(state, runner);
         state_machine
             .cycle()
             .<span class="kw">await
@@ -1658,8 +1658,8 @@
                 epoch: beacon.epoch,
                 signed_entity_type: SignedEntityType::dummy(),
             },
-            <span class="kw-2">*</span>state_machine.get_state()
-        );
+            state_machine.get_state().<span class="kw">await
+        </span>);
     }
 }
 </code></pre></div></section></main></body></html>

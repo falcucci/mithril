@@ -79,7 +79,23 @@
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
 </pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 </span><span class="doccomment">//! Define all the tooling necessary to manipulate Mithril certified types from a
 //! [Mithril Aggregator](https://mithril.network/rust-doc/mithril_aggregator/index.html).
@@ -99,6 +115,8 @@
 //! # Example
 //!
 //! Below is an example describing the usage of most of the library&#39;s functions together:
+//!
+//! **Note:** _Snapshot download and the compute snapshot message functions are available using crate feature_ **fs**.
 //!
 //! ```no_run
 //! # async fn run() -&gt; mithril_client::MithrilResult&lt;()&gt; {
@@ -133,14 +151,26 @@
 //! # }
 //! ```
 
-</span><span class="kw">pub mod </span>aggregator_client;
+</span><span class="macro">macro_rules! </span>cfg_fs {
+    ($(<span class="macro-nonterminal">$item</span>:item)<span class="kw-2">*</span>) =&gt; {
+        $(
+            <span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+            #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;fs&quot;</span>)))]
+            </span><span class="macro-nonterminal">$item
+        </span>)*
+    }
+}
+
+<span class="kw">pub mod </span>aggregator_client;
 <span class="kw">pub mod </span>certificate_client;
 <span class="kw">mod </span>client;
 <span class="kw">pub mod </span>feedback;
 <span class="kw">mod </span>message;
 <span class="kw">pub mod </span>mithril_stake_distribution_client;
 <span class="kw">pub mod </span>snapshot_client;
-<span class="kw">pub mod </span>snapshot_downloader;
+<span class="macro">cfg_fs! </span>{
+    <span class="kw">pub mod </span>snapshot_downloader;
+}
 <span class="kw">mod </span>type_alias;
 <span class="kw">mod </span>utils;
 
