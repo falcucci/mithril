@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["AggregatorClientError","AggregatorRequest"],"struct":["AggregatorHTTPClient"],"trait":["AggregatorClient"]};

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkmithril_doc=self.webpackChunkmithril_doc||[]).push([[1186],{79116:a=>{a.exports=JSON.parse('{"label":"era activation","permalink":"/doc/dev-blog/tags/era-activation","allTagsPath":"/doc/dev-blog/tags","count":1}')}}]);

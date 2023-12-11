@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmithril_doc=self.webpackChunkmithril_doc||[]).push([[4005],{88680:e=>{e.exports=JSON.parse('{"label":"hybrid-mode","permalink":"/doc/dev-blog/tags/hybrid-mode","allTagsPath":"/doc/dev-blog/tags","count":1,"unlisted":false}')}}]);

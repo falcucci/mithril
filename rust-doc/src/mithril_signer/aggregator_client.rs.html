@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mithril-signer/src/aggregator_client.rs`."><title>aggregator_client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="mithril_signer" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../mithril_signer/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mithril-signer/src/aggregator_client.rs`."><title>aggregator_client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="mithril_signer" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../mithril_signer/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -809,11 +809,140 @@
 <a href="#809" id="809">809</a>
 <a href="#810" id="810">810</a>
 <a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::anyhow;
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>reqwest::{<span class="self">self</span>, Client, Proxy, RequestBuilder, Response, StatusCode};
 <span class="kw">use </span>slog_scope::debug;
-<span class="kw">use </span>std::{io, sync::Arc};
+<span class="kw">use </span>std::{io, sync::Arc, time::Duration};
 <span class="kw">use </span>thiserror::Error;
 
 <span class="kw">use </span>mithril_common::{
@@ -917,6 +1046,7 @@
     aggregator_endpoint: String,
     relay_endpoint: <span class="prelude-ty">Option</span>&lt;String&gt;,
     api_version_provider: Arc&lt;APIVersionProvider&gt;,
+    timeout_duration: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
 <span class="kw">impl </span>AggregatorHTTPClient {
@@ -925,12 +1055,14 @@
         aggregator_endpoint: String,
         relay_endpoint: <span class="prelude-ty">Option</span>&lt;String&gt;,
         api_version_provider: Arc&lt;APIVersionProvider&gt;,
+        timeout_duration: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="macro">debug!</span>(<span class="string">&quot;New AggregatorHTTPClient created&quot;</span>);
         <span class="self">Self </span>{
             aggregator_endpoint,
             relay_endpoint,
             api_version_provider,
+            timeout_duration,
         }
     }
 
@@ -951,7 +1083,7 @@
 
     <span class="doccomment">/// Forge a client request adding protocol version in the headers.
     </span><span class="kw">pub fn </span>prepare_request_builder(<span class="kw-2">&amp;</span><span class="self">self</span>, request_builder: RequestBuilder) -&gt; RequestBuilder {
-        request_builder
+        <span class="kw">let </span>request_builder = request_builder
             .header(
                 MITHRIL_API_VERSION_HEADER,
                 <span class="self">self</span>.api_version_provider
@@ -959,7 +1091,13 @@
                     .unwrap()
                     .to_string(),
             )
-            .header(MITHRIL_SIGNER_VERSION_HEADER, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>))
+            .header(MITHRIL_SIGNER_VERSION_HEADER, <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>));
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(duration) = <span class="self">self</span>.timeout_duration {
+            request_builder.timeout(duration)
+        } <span class="kw">else </span>{
+            request_builder
+        }
     }
 
     <span class="doccomment">/// API version error handling
@@ -1261,6 +1399,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">let </span>epoch_settings = certificate_handler.retrieve_epoch_settings().<span class="kw">await</span>;
         epoch_settings.as_ref().expect(<span class="string">&quot;unexpected error&quot;</span>);
@@ -1282,6 +1421,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">let </span>epoch_settings = certificate_handler
             .retrieve_epoch_settings()
@@ -1302,6 +1442,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
 
         <span class="kw">match </span>certificate_handler
@@ -1312,6 +1453,31 @@
             AggregatorClientError::RemoteServerTechnical(<span class="kw">_</span>) =&gt; (),
             e =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected Aggregator::RemoteServerTechnical error, got &#39;{e:?}&#39;.&quot;</span>),
         };
+    }
+
+    <span class="attr">#[tokio::test]
+    </span><span class="kw">async fn </span>test_epoch_settings_timeout() {
+        <span class="kw">let </span>(server, config, api_version_provider) = setup_test();
+        <span class="kw">let </span>_snapshots_mock = server.mock(|when, then| {
+            when.path(<span class="string">&quot;/epoch-settings&quot;</span>);
+            then.delay(Duration::from_millis(<span class="number">200</span>));
+        });
+        <span class="kw">let </span>certificate_handler = AggregatorHTTPClient::new(
+            config.aggregator_endpoint,
+            config.relay_endpoint,
+            Arc::new(api_version_provider),
+            <span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">50</span>)),
+        );
+
+        <span class="kw">let </span>error = certificate_handler
+            .retrieve_epoch_settings()
+            .<span class="kw">await
+            </span>.expect_err(<span class="string">&quot;retrieve_epoch_settings should fail&quot;</span>);
+
+        <span class="macro">assert!</span>(
+            <span class="macro">matches!</span>(error, AggregatorClientError::RemoteServerUnreachable(<span class="kw">_</span>)),
+            <span class="string">&quot;unexpected error type: {error:?}&quot;
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1327,6 +1493,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">let </span>pending_certificate = certificate_handler.retrieve_pending_certificate().<span class="kw">await</span>;
         pending_certificate.as_ref().expect(<span class="string">&quot;unexpected error&quot;</span>);
@@ -1349,6 +1516,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">let </span>error = certificate_handler
             .retrieve_pending_certificate()
@@ -1369,6 +1537,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">let </span>pending_certificate = certificate_handler.retrieve_pending_certificate().<span class="kw">await</span>;
         <span class="macro">assert!</span>(pending_certificate.expect(<span class="string">&quot;unexpected error&quot;</span>).is_none());
@@ -1385,6 +1554,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
 
         <span class="kw">match </span>certificate_handler
@@ -1395,6 +1565,31 @@
             AggregatorClientError::RemoteServerTechnical(<span class="kw">_</span>) =&gt; (),
             e =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected Aggregator::RemoteServerTechnical error, got &#39;{e:?}&#39;.&quot;</span>),
         };
+    }
+
+    <span class="attr">#[tokio::test]
+    </span><span class="kw">async fn </span>test_pending_certificate_timeout() {
+        <span class="kw">let </span>(server, config, api_version_provider) = setup_test();
+        <span class="kw">let </span>_snapshots_mock = server.mock(|when, then| {
+            when.path(<span class="string">&quot;/certificate-pending&quot;</span>);
+            then.delay(Duration::from_millis(<span class="number">200</span>));
+        });
+        <span class="kw">let </span>certificate_handler = AggregatorHTTPClient::new(
+            config.aggregator_endpoint,
+            config.relay_endpoint,
+            Arc::new(api_version_provider),
+            <span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">50</span>)),
+        );
+
+        <span class="kw">let </span>error = certificate_handler
+            .retrieve_pending_certificate()
+            .<span class="kw">await
+            </span>.expect_err(<span class="string">&quot;retrieve_pending_certificate should fail&quot;</span>);
+
+        <span class="macro">assert!</span>(
+            <span class="macro">matches!</span>(error, AggregatorClientError::RemoteServerUnreachable(<span class="kw">_</span>)),
+            <span class="string">&quot;unexpected error type: {error:?}&quot;
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1411,6 +1606,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">let </span>register_signer = certificate_handler
             .register_signer(epoch, single_signer)
@@ -1433,6 +1629,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">let </span>error = certificate_handler
             .register_signer(epoch, single_signer)
@@ -1462,6 +1659,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
 
         <span class="kw">match </span>certificate_handler
@@ -1492,6 +1690,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
 
         <span class="kw">match </span>certificate_handler
@@ -1502,6 +1701,34 @@
             AggregatorClientError::RemoteServerTechnical(<span class="kw">_</span>) =&gt; (),
             e =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected Aggregator::RemoteServerTechnical error, got &#39;{e:?}&#39;.&quot;</span>),
         };
+    }
+
+    <span class="attr">#[tokio::test]
+    </span><span class="kw">async fn </span>test_register_signer_timeout() {
+        <span class="kw">let </span>epoch = Epoch(<span class="number">1</span>);
+        <span class="kw">let </span>single_signers = fake_data::signers(<span class="number">1</span>);
+        <span class="kw">let </span>single_signer = single_signers.first().unwrap();
+        <span class="kw">let </span>(server, config, api_version_provider) = setup_test();
+        <span class="kw">let </span>_snapshots_mock = server.mock(|when, then| {
+            when.method(POST).path(<span class="string">&quot;/register-signer&quot;</span>);
+            then.delay(Duration::from_millis(<span class="number">200</span>));
+        });
+        <span class="kw">let </span>certificate_handler = AggregatorHTTPClient::new(
+            config.aggregator_endpoint,
+            config.relay_endpoint,
+            Arc::new(api_version_provider),
+            <span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">50</span>)),
+        );
+
+        <span class="kw">let </span>error = certificate_handler
+            .register_signer(epoch, single_signer)
+            .<span class="kw">await
+            </span>.expect_err(<span class="string">&quot;register_signer should fail&quot;</span>);
+
+        <span class="macro">assert!</span>(
+            <span class="macro">matches!</span>(error, AggregatorClientError::RemoteServerUnreachable(<span class="kw">_</span>)),
+            <span class="string">&quot;unexpected error type: {error:?}&quot;
+        </span>);
     }
 
     <span class="attr">#[tokio::test]
@@ -1516,6 +1743,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">let </span>register_signatures = certificate_handler
             .register_signatures(<span class="kw-2">&amp;</span>SignedEntityType::dummy(), <span class="kw-2">&amp;</span>single_signatures)
@@ -1536,6 +1764,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">let </span>error = certificate_handler
             .register_signatures(<span class="kw-2">&amp;</span>SignedEntityType::dummy(), <span class="kw-2">&amp;</span>single_signatures)
@@ -1563,6 +1792,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">match </span>certificate_handler
             .register_signatures(<span class="kw-2">&amp;</span>SignedEntityType::dummy(), <span class="kw-2">&amp;</span>single_signatures)
@@ -1586,6 +1816,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">match </span>certificate_handler
             .register_signatures(<span class="kw-2">&amp;</span>SignedEntityType::dummy(), <span class="kw-2">&amp;</span>single_signatures)
@@ -1609,6 +1840,7 @@
             config.aggregator_endpoint,
             config.relay_endpoint,
             Arc::new(api_version_provider),
+            <span class="prelude-val">None</span>,
         );
         <span class="kw">match </span>certificate_handler
             .register_signatures(<span class="kw-2">&amp;</span>SignedEntityType::dummy(), <span class="kw-2">&amp;</span>single_signatures)
@@ -1618,6 +1850,32 @@
             AggregatorClientError::RemoteServerTechnical(<span class="kw">_</span>) =&gt; (),
             e =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected Aggregator::RemoteServerTechnical error, got &#39;{e:?}&#39;.&quot;</span>),
         };
+    }
+
+    <span class="attr">#[tokio::test]
+    </span><span class="kw">async fn </span>test_register_signatures_timeout() {
+        <span class="kw">let </span>single_signatures = fake_data::single_signatures((<span class="number">1</span>..<span class="number">5</span>).collect());
+        <span class="kw">let </span>(server, config, api_version_provider) = setup_test();
+        <span class="kw">let </span>_snapshots_mock = server.mock(|when, then| {
+            when.method(POST).path(<span class="string">&quot;/register-signatures&quot;</span>);
+            then.delay(Duration::from_millis(<span class="number">200</span>));
+        });
+        <span class="kw">let </span>certificate_handler = AggregatorHTTPClient::new(
+            config.aggregator_endpoint,
+            config.relay_endpoint,
+            Arc::new(api_version_provider),
+            <span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">50</span>)),
+        );
+
+        <span class="kw">let </span>error = certificate_handler
+            .register_signatures(<span class="kw-2">&amp;</span>SignedEntityType::dummy(), <span class="kw-2">&amp;</span>single_signatures)
+            .<span class="kw">await
+            </span>.expect_err(<span class="string">&quot;register_signatures should fail&quot;</span>);
+
+        <span class="macro">assert!</span>(
+            <span class="macro">matches!</span>(error, AggregatorClientError::RemoteServerUnreachable(<span class="kw">_</span>)),
+            <span class="string">&quot;unexpected error type: {error:?}&quot;
+        </span>);
     }
 }
 </code></pre></div></section></main></body></html>

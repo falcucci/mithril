@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mithril-aggregator/src/http_server/routes/artifact_routes/snapshot.rs`."><title>snapshot.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="mithril_aggregator" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../mithril_aggregator/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mithril-aggregator/src/http_server/routes/artifact_routes/snapshot.rs`."><title>snapshot.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="mithril_aggregator" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../mithril_aggregator/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -526,8 +526,6 @@
 <a href="#526" id="526">526</a>
 <a href="#527" id="527">527</a>
 <a href="#528" id="528">528</a>
-<a href="#529" id="529">529</a>
-<a href="#530" id="530">530</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::http_server::routes::middlewares;
 <span class="kw">use </span><span class="kw">crate</span>::http_server::SERVER_BASE_PATH;
 <span class="kw">use </span><span class="kw">crate</span>::DependencyContainer;
@@ -554,7 +552,7 @@
 ) -&gt; <span class="kw">impl </span>Filter&lt;Extract = (<span class="kw">impl </span>warp::Reply,), Error = warp::Rejection&gt; + Clone {
     <span class="macro">warp::path!</span>(<span class="string">&quot;artifact&quot; </span>/ <span class="string">&quot;snapshots&quot;</span>)
         .and(warp::get())
-        .and(middlewares::with_signed_entity_service(dependency_manager))
+        .and(middlewares::with_http_message_service(dependency_manager))
         .and_then(handlers::list_artifacts)
 }
 
@@ -564,7 +562,7 @@
 ) -&gt; <span class="kw">impl </span>Filter&lt;Extract = (<span class="kw">impl </span>warp::Reply,), Error = warp::Rejection&gt; + Clone {
     <span class="macro">warp::path!</span>(<span class="string">&quot;artifact&quot; </span>/ <span class="string">&quot;snapshot&quot; </span>/ String)
         .and(warp::get())
-        .and(middlewares::with_signed_entity_service(dependency_manager))
+        .and(middlewares::with_http_message_service(dependency_manager))
         .and_then(handlers::get_artifact_by_signed_entity_id)
 }
 
@@ -621,10 +619,8 @@
 <span class="kw">mod </span>handlers {
     <span class="kw">use </span><span class="kw">crate</span>::http_server::routes::reply;
     <span class="kw">use </span><span class="kw">crate</span>::http_server::SERVER_BASE_PATH;
-    <span class="kw">use </span><span class="kw">crate</span>::message_adapters::ToSnapshotListMessageAdapter;
-    <span class="kw">use </span><span class="kw">crate</span>::message_adapters::ToSnapshotMessageAdapter;
+    <span class="kw">use </span><span class="kw">crate</span>::services::MessageService;
     <span class="kw">use crate</span>::{services::SignedEntityService, Configuration};
-    <span class="kw">use </span>mithril_common::messages::ToMessageAdapter;
     <span class="kw">use </span>slog_scope::{debug, warn};
     <span class="kw">use </span>std::convert::Infallible;
     <span class="kw">use </span>std::str::FromStr;
@@ -635,18 +631,15 @@
 
     <span class="doccomment">/// List Snapshot artifacts
     </span><span class="kw">pub async fn </span>list_artifacts(
-        signed_entity_service: Arc&lt;<span class="kw">dyn </span>SignedEntityService&gt;,
+        http_message_service: Arc&lt;<span class="kw">dyn </span>MessageService&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">impl </span>warp::Reply, Infallible&gt; {
         <span class="macro">debug!</span>(<span class="string">&quot;⇄ HTTP SERVER: artifacts&quot;</span>);
 
-        <span class="kw">match </span>signed_entity_service
-            .get_last_signed_snapshots(LIST_MAX_ITEMS)
+        <span class="kw">match </span>http_message_service
+            .get_snapshot_list_message(LIST_MAX_ITEMS)
             .<span class="kw">await
         </span>{
-            <span class="prelude-val">Ok</span>(signed_entities) =&gt; {
-                <span class="kw">let </span>messages = ToSnapshotListMessageAdapter::adapt(signed_entities);
-                <span class="prelude-val">Ok</span>(reply::json(<span class="kw-2">&amp;</span>messages, StatusCode::OK))
-            }
+            <span class="prelude-val">Ok</span>(message) =&gt; <span class="prelude-val">Ok</span>(reply::json(<span class="kw-2">&amp;</span>message, StatusCode::OK)),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="macro">warn!</span>(<span class="string">&quot;list_artifacts_snapshot&quot;</span>; <span class="string">&quot;error&quot; </span>=&gt; <span class="question-mark">?</span>err);
                 <span class="prelude-val">Ok</span>(reply::internal_server_error(err))
@@ -657,17 +650,14 @@
     <span class="doccomment">/// Get Artifact by signed entity id
     </span><span class="kw">pub async fn </span>get_artifact_by_signed_entity_id(
         signed_entity_id: String,
-        signed_entity_service: Arc&lt;<span class="kw">dyn </span>SignedEntityService&gt;,
+        http_message_service: Arc&lt;<span class="kw">dyn </span>MessageService&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">impl </span>warp::Reply, Infallible&gt; {
         <span class="macro">debug!</span>(<span class="string">&quot;⇄ HTTP SERVER: artifact/{signed_entity_id}&quot;</span>);
-        <span class="kw">match </span>signed_entity_service
-            .get_signed_snapshot_by_id(<span class="kw-2">&amp;</span>signed_entity_id)
+        <span class="kw">match </span>http_message_service
+            .get_snapshot_message(<span class="kw-2">&amp;</span>signed_entity_id)
             .<span class="kw">await
         </span>{
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(signed_entity)) =&gt; {
-                <span class="kw">let </span>message = ToSnapshotMessageAdapter::adapt(signed_entity);
-                <span class="prelude-val">Ok</span>(reply::json(<span class="kw-2">&amp;</span>message, StatusCode::OK))
-            }
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(signed_entity)) =&gt; <span class="prelude-val">Ok</span>(reply::json(<span class="kw-2">&amp;</span>signed_entity, StatusCode::OK)),
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
                 <span class="macro">warn!</span>(<span class="string">&quot;snapshot_details::not_found&quot;</span>);
                 <span class="prelude-val">Ok</span>(reply::empty(StatusCode::NOT_FOUND))
@@ -759,11 +749,15 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use crate</span>::{
-        http_server::SERVER_BASE_PATH, initialize_dependencies, services::MockSignedEntityService,
+        http_server::SERVER_BASE_PATH,
+        initialize_dependencies,
+        message_adapters::{ToSnapshotListMessageAdapter, ToSnapshotMessageAdapter},
+        services::{MockMessageService, MockSignedEntityService},
     };
     <span class="kw">use </span>chrono::{DateTime, Utc};
     <span class="kw">use </span>mithril_common::{
         entities::{Beacon, SignedEntity, SignedEntityType},
+        messages::ToMessageAdapter,
         signable_builder::Artifact,
         sqlite::HydrationError,
         test_utils::{apispec::APISpec, fake_data},
@@ -814,13 +808,14 @@
             SignedEntityType::CardanoImmutableFilesFull(Beacon::default()),
             fake_data::snapshots(<span class="number">5</span>),
         );
-        <span class="kw">let </span><span class="kw-2">mut </span>mock_signed_entity_service = MockSignedEntityService::new();
-        mock_signed_entity_service
-            .expect_get_last_signed_snapshots()
-            .return_once(|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(signed_entities))
+        <span class="kw">let </span>message = ToSnapshotListMessageAdapter::adapt(signed_entities);
+        <span class="kw">let </span><span class="kw-2">mut </span>mock_http_message_service = MockMessageService::new();
+        mock_http_message_service
+            .expect_get_snapshot_list_message()
+            .return_once(|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(message))
             .once();
         <span class="kw">let </span><span class="kw-2">mut </span>dependency_manager = initialize_dependencies().<span class="kw">await</span>;
-        dependency_manager.signed_entity_service = Arc::new(mock_signed_entity_service);
+        dependency_manager.message_service = Arc::new(mock_http_message_service);
 
         <span class="kw">let </span>method = Method::GET.as_str();
         <span class="kw">let </span>path = <span class="string">&quot;/artifact/snapshots&quot;</span>;
@@ -843,13 +838,13 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_snapshots_get_ko() {
-        <span class="kw">let </span><span class="kw-2">mut </span>mock_signed_entity_service = MockSignedEntityService::new();
-        mock_signed_entity_service
-            .expect_get_last_signed_snapshots()
+        <span class="kw">let </span><span class="kw-2">mut </span>mock_http_message_service = MockMessageService::new();
+        mock_http_message_service
+            .expect_get_snapshot_list_message()
             .return_once(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(HydrationError::InvalidData(<span class="string">&quot;invalid data&quot;</span>.to_string()).into()))
             .once();
         <span class="kw">let </span><span class="kw-2">mut </span>dependency_manager = initialize_dependencies().<span class="kw">await</span>;
-        dependency_manager.signed_entity_service = Arc::new(mock_signed_entity_service);
+        dependency_manager.message_service = Arc::new(mock_http_message_service);
 
         <span class="kw">let </span>method = Method::GET.as_str();
         <span class="kw">let </span>path = <span class="string">&quot;/artifact/snapshots&quot;</span>;
@@ -879,13 +874,14 @@
         .first()
         .unwrap()
         .to_owned();
-        <span class="kw">let </span><span class="kw-2">mut </span>mock_signed_entity_service = MockSignedEntityService::new();
-        mock_signed_entity_service
-            .expect_get_signed_snapshot_by_id()
-            .return_once(|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(signed_entity)))
+        <span class="kw">let </span>message = ToSnapshotMessageAdapter::adapt(signed_entity);
+        <span class="kw">let </span><span class="kw-2">mut </span>mock_http_message_service = MockMessageService::new();
+        mock_http_message_service
+            .expect_get_snapshot_message()
+            .return_once(|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(message)))
             .once();
         <span class="kw">let </span><span class="kw-2">mut </span>dependency_manager = initialize_dependencies().<span class="kw">await</span>;
-        dependency_manager.signed_entity_service = Arc::new(mock_signed_entity_service);
+        dependency_manager.message_service = Arc::new(mock_http_message_service);
 
         <span class="kw">let </span>method = Method::GET.as_str();
         <span class="kw">let </span>path = <span class="string">&quot;/artifact/snapshot/{digest}&quot;</span>;
@@ -908,13 +904,13 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_snapshot_digest_get_ok_nosnapshot() {
-        <span class="kw">let </span><span class="kw-2">mut </span>mock_signed_entity_service = MockSignedEntityService::new();
-        mock_signed_entity_service
-            .expect_get_signed_snapshot_by_id()
+        <span class="kw">let </span><span class="kw-2">mut </span>mock_http_message_service = MockMessageService::new();
+        mock_http_message_service
+            .expect_get_snapshot_message()
             .return_once(|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>))
             .once();
         <span class="kw">let </span><span class="kw-2">mut </span>dependency_manager = initialize_dependencies().<span class="kw">await</span>;
-        dependency_manager.signed_entity_service = Arc::new(mock_signed_entity_service);
+        dependency_manager.message_service = Arc::new(mock_http_message_service);
 
         <span class="kw">let </span>method = Method::GET.as_str();
         <span class="kw">let </span>path = <span class="string">&quot;/artifact/snapshot/{digest}&quot;</span>;
@@ -937,13 +933,13 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_snapshot_digest_get_ko() {
-        <span class="kw">let </span><span class="kw-2">mut </span>mock_signed_entity_service = MockSignedEntityService::new();
-        mock_signed_entity_service
-            .expect_get_signed_snapshot_by_id()
+        <span class="kw">let </span><span class="kw-2">mut </span>mock_http_message_service = MockMessageService::new();
+        mock_http_message_service
+            .expect_get_snapshot_message()
             .return_once(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(HydrationError::InvalidData(<span class="string">&quot;invalid data&quot;</span>.to_string()).into()))
             .once();
         <span class="kw">let </span><span class="kw-2">mut </span>dependency_manager = initialize_dependencies().<span class="kw">await</span>;
-        dependency_manager.signed_entity_service = Arc::new(mock_signed_entity_service);
+        dependency_manager.message_service = Arc::new(mock_http_message_service);
 
         <span class="kw">let </span>method = Method::GET.as_str();
         <span class="kw">let </span>path = <span class="string">&quot;/artifact/snapshot/{digest}&quot;</span>;

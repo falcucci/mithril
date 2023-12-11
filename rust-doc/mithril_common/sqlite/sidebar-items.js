@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["HydrationError"],"fn":["vacuum_database"],"struct":["EntityCursor","Projection","ProjectionField","SourceAlias","WhereCondition"],"trait":["Provider","SqLiteEntity"]};
+window.SIDEBAR_ITEMS = {"enum":["HydrationError"],"fn":["vacuum_database"],"struct":["EntityCursor","Projection","ProjectionField","SourceAlias","WhereCondition"],"trait":["Provider","SqLiteEntity"],"type":["SqliteConnection"]};

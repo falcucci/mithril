@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mithril-aggregator/src/database/provider/signed_entity.rs`."><title>signed_entity.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="mithril_aggregator" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../mithril_aggregator/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mithril-aggregator/src/database/provider/signed_entity.rs`."><title>signed_entity.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="mithril_aggregator" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../mithril_aggregator/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -951,22 +951,119 @@
 <a href="#951" id="951">951</a>
 <a href="#952" id="952">952</a>
 <a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::Context;
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>chrono::{DateTime, Utc};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="kw">use </span>sqlite::{Connection, ConnectionWithFullMutex, Value};
+<span class="kw">use </span>sqlite::Value;
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>mithril_common::{
-    entities::{SignedEntity, SignedEntityType, SignedEntityTypeDiscriminants, Snapshot},
+    crypto_helper::ProtocolParameters,
+    entities::{Epoch, SignedEntity, SignedEntityType, SignedEntityTypeDiscriminants, Snapshot},
+    messages::{
+        MithrilStakeDistributionListItemMessage, MithrilStakeDistributionMessage,
+        SignerWithStakeMessagePart, SnapshotListItemMessage, SnapshotMessage,
+    },
     signable_builder::Artifact,
     sqlite::{
         EntityCursor, HydrationError, Projection, Provider, SourceAlias, SqLiteEntity,
-        WhereCondition,
+        SqliteConnection, WhereCondition,
     },
     store::adapter::AdapterError,
-    StdResult,
+    StdError, StdResult,
 };
 
 <span class="attr">#[cfg(test)]
@@ -1013,6 +1110,92 @@
         };
 
         <span class="prelude-val">Ok</span>(signed_entity)
+    }
+}
+
+<span class="kw">impl </span>TryFrom&lt;SignedEntityRecord&gt; <span class="kw">for </span>SnapshotMessage {
+    <span class="kw">type </span>Error = StdError;
+
+    <span class="kw">fn </span>try_from(value: SignedEntityRecord) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>artifact = serde_json::from_str::&lt;Snapshot&gt;(<span class="kw-2">&amp;</span>value.artifact)<span class="question-mark">?</span>;
+        <span class="kw">let </span>snapshot_message = SnapshotMessage {
+            digest: artifact.digest,
+            beacon: artifact.beacon,
+            certificate_hash: value.certificate_id,
+            size: artifact.size,
+            created_at: value.created_at,
+            locations: artifact.locations,
+            compression_algorithm: <span class="prelude-val">Some</span>(artifact.compression_algorithm),
+            cardano_node_version: <span class="prelude-val">Some</span>(artifact.cardano_node_version),
+        };
+
+        <span class="prelude-val">Ok</span>(snapshot_message)
+    }
+}
+
+<span class="kw">impl </span>TryFrom&lt;SignedEntityRecord&gt; <span class="kw">for </span>MithrilStakeDistributionMessage {
+    <span class="kw">type </span>Error = StdError;
+
+    <span class="kw">fn </span>try_from(value: SignedEntityRecord) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="attr">#[derive(Deserialize)]
+        </span><span class="kw">struct </span>TmpMithrilStakeDistribution {
+            epoch: Epoch,
+            signers_with_stake: Vec&lt;SignerWithStakeMessagePart&gt;,
+            hash: String,
+            protocol_parameters: ProtocolParameters,
+        }
+        <span class="kw">let </span>artifact = serde_json::from_str::&lt;TmpMithrilStakeDistribution&gt;(<span class="kw-2">&amp;</span>value.artifact)<span class="question-mark">?</span>;
+        <span class="kw">let </span>mithtril_stake_distribution_message = MithrilStakeDistributionMessage {
+            epoch: artifact.epoch,
+            signers_with_stake: artifact.signers_with_stake,
+            hash: artifact.hash,
+            certificate_hash: value.certificate_id,
+            created_at: value.created_at,
+            protocol_parameters: artifact.protocol_parameters.into(),
+        };
+
+        <span class="prelude-val">Ok</span>(mithtril_stake_distribution_message)
+    }
+}
+
+<span class="kw">impl </span>TryFrom&lt;SignedEntityRecord&gt; <span class="kw">for </span>MithrilStakeDistributionListItemMessage {
+    <span class="kw">type </span>Error = StdError;
+
+    <span class="kw">fn </span>try_from(value: SignedEntityRecord) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="attr">#[derive(Deserialize)]
+        </span><span class="kw">struct </span>TmpMithrilStakeDistribution {
+            epoch: Epoch,
+            hash: String,
+        }
+        <span class="kw">let </span>artifact = serde_json::from_str::&lt;TmpMithrilStakeDistribution&gt;(<span class="kw-2">&amp;</span>value.artifact)<span class="question-mark">?</span>;
+        <span class="kw">let </span>message = MithrilStakeDistributionListItemMessage {
+            epoch: artifact.epoch,
+            hash: artifact.hash,
+            certificate_hash: value.certificate_id,
+            created_at: value.created_at,
+        };
+
+        <span class="prelude-val">Ok</span>(message)
+    }
+}
+
+<span class="kw">impl </span>TryFrom&lt;SignedEntityRecord&gt; <span class="kw">for </span>SnapshotListItemMessage {
+    <span class="kw">type </span>Error = StdError;
+
+    <span class="kw">fn </span>try_from(value: SignedEntityRecord) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>artifact = serde_json::from_str::&lt;Snapshot&gt;(<span class="kw-2">&amp;</span>value.artifact)<span class="question-mark">?</span>;
+        <span class="kw">let </span>message = SnapshotListItemMessage {
+            digest: artifact.digest,
+            beacon: artifact.beacon,
+            certificate_hash: value.certificate_id,
+            size: artifact.size,
+            created_at: value.created_at,
+            locations: artifact.locations,
+            compression_algorithm: <span class="prelude-val">Some</span>(artifact.compression_algorithm),
+            cardano_node_version: <span class="prelude-val">Some</span>(artifact.cardano_node_version),
+        };
+
+        <span class="prelude-val">Ok</span>(message)
     }
 }
 
@@ -1081,12 +1264,12 @@
 
 <span class="doccomment">/// Simple [SignedEntityRecord] provider.
 </span><span class="kw">pub struct </span>SignedEntityRecordProvider&lt;<span class="lifetime">&#39;client</span>&gt; {
-    client: <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>Connection,
+    client: <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>SqliteConnection,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;client</span>&gt; SignedEntityRecordProvider&lt;<span class="lifetime">&#39;client</span>&gt; {
     <span class="doccomment">/// Create a new provider
-    </span><span class="kw">pub fn </span>new(client: <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>Connection) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(client: <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>SqliteConnection) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ client }
     }
 
@@ -1181,7 +1364,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;client</span>&gt; Provider&lt;<span class="lifetime">&#39;client</span>&gt; <span class="kw">for </span>SignedEntityRecordProvider&lt;<span class="lifetime">&#39;client</span>&gt; {
     <span class="kw">type </span>Entity = SignedEntityRecord;
 
-    <span class="kw">fn </span>get_connection(<span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>Connection {
+    <span class="kw">fn </span>get_connection(<span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>SqliteConnection {
         <span class="self">self</span>.client
     }
 
@@ -1196,12 +1379,12 @@
 
 <span class="doccomment">/// Query to insert the signed_entity record
 </span><span class="kw">pub struct </span>InsertSignedEntityRecordProvider&lt;<span class="lifetime">&#39;conn</span>&gt; {
-    connection: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>Connection,
+    connection: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>SqliteConnection,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;conn</span>&gt; InsertSignedEntityRecordProvider&lt;<span class="lifetime">&#39;conn</span>&gt; {
     <span class="doccomment">/// Create a new instance
-    </span><span class="kw">pub fn </span>new(connection: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>Connection) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(connection: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>SqliteConnection) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ connection }
     }
 
@@ -1235,7 +1418,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;conn</span>&gt; Provider&lt;<span class="lifetime">&#39;conn</span>&gt; <span class="kw">for </span>InsertSignedEntityRecordProvider&lt;<span class="lifetime">&#39;conn</span>&gt; {
     <span class="kw">type </span>Entity = SignedEntityRecord;
 
-    <span class="kw">fn </span>get_connection(<span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>Connection {
+    <span class="kw">fn </span>get_connection(<span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>SqliteConnection {
         <span class="self">self</span>.connection
     }
 
@@ -1250,11 +1433,11 @@
 }
 
 <span class="kw">struct </span>UpdateSignedEntityProvider&lt;<span class="lifetime">&#39;client</span>&gt; {
-    connection: <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>Connection,
+    connection: <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>SqliteConnection,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;client</span>&gt; UpdateSignedEntityProvider&lt;<span class="lifetime">&#39;client</span>&gt; {
-    <span class="kw">pub fn </span>new(connection: <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>Connection) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(connection: <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>SqliteConnection) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ connection }
     }
 
@@ -1294,7 +1477,7 @@ where signed_entity_id = ?*&quot;</span>;
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;client</span>&gt; Provider&lt;<span class="lifetime">&#39;client</span>&gt; <span class="kw">for </span>UpdateSignedEntityProvider&lt;<span class="lifetime">&#39;client</span>&gt; {
     <span class="kw">type </span>Entity = SignedEntityRecord;
 
-    <span class="kw">fn </span>get_connection(<span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>Connection {
+    <span class="kw">fn </span>get_connection(<span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;client </span>SqliteConnection {
         <span class="self">self</span>.connection
     }
 
@@ -1347,12 +1530,12 @@ where signed_entity_id = ?*&quot;</span>;
 
 <span class="doccomment">/// Service to deal with signed_entity (read &amp; write).
 </span><span class="kw">pub struct </span>SignedEntityStoreAdapter {
-    connection: Arc&lt;ConnectionWithFullMutex&gt;,
+    connection: Arc&lt;SqliteConnection&gt;,
 }
 
 <span class="kw">impl </span>SignedEntityStoreAdapter {
     <span class="doccomment">/// Create a new SignedEntityStoreAdapter service
-    </span><span class="kw">pub fn </span>new(connection: Arc&lt;ConnectionWithFullMutex&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(connection: Arc&lt;SqliteConnection&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ connection }
     }
 }
@@ -1445,6 +1628,7 @@ where signed_entity_id = ?*&quot;</span>;
     <span class="kw">use </span><span class="kw">crate</span>::database::provider::{apply_all_migrations_to_db, disable_foreign_key_support};
     <span class="kw">use </span>mithril_common::entities::MithrilStakeDistribution;
     <span class="kw">use </span>mithril_common::{entities::Beacon, test_utils::fake_data};
+    <span class="kw">use </span>sqlite::Connection;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
@@ -1488,7 +1672,7 @@ where signed_entity_id = ?*&quot;</span>;
     }
 
     <span class="kw">pub fn </span>setup_signed_entity_db(
-        connection: <span class="kw-2">&amp;</span>Connection,
+        connection: <span class="kw-2">&amp;</span>SqliteConnection,
         signed_entity_records: Vec&lt;SignedEntityRecord&gt;,
     ) -&gt; StdResult&lt;()&gt; {
         apply_all_migrations_to_db(connection)<span class="question-mark">?</span>;
@@ -1539,7 +1723,7 @@ where signed_entity_id = ?*&quot;</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>insert_golden_signed_entities(connection: <span class="kw-2">&amp;</span>Connection) {
+    <span class="kw">fn </span>insert_golden_signed_entities(connection: <span class="kw-2">&amp;</span>SqliteConnection) {
         connection
             .execute(<span class="string">r#&quot;
             -- Cardano immutable file full
@@ -1589,7 +1773,7 @@ where signed_entity_id = ?*&quot;</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_golden_master() {
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         setup_signed_entity_db(<span class="kw-2">&amp;</span>connection, <span class="macro">vec!</span>[]).unwrap();
         insert_golden_signed_entities(<span class="kw-2">&amp;</span>connection);
 
@@ -1640,7 +1824,7 @@ where signed_entity_id = ?*&quot;</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>get_signed_entity_record_by_signed_entity_type() {
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         <span class="kw">let </span>provider = SignedEntityRecordProvider::new(<span class="kw-2">&amp;</span>connection);
         <span class="kw">let </span>condition = provider
             .condition_by_signed_entity_type(
@@ -1655,7 +1839,7 @@ where signed_entity_id = ?*&quot;</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>get_signed_entity_record_by_signed_entity_id() {
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         <span class="kw">let </span>provider = SignedEntityRecordProvider::new(<span class="kw-2">&amp;</span>connection);
         <span class="kw">let </span>condition = provider
             .condition_by_signed_entity_id(<span class="string">&quot;signed-ent-123&quot;</span>)
@@ -1668,7 +1852,7 @@ where signed_entity_id = ?*&quot;</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>get_signed_entity_record_by_signed_certificate_id() {
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         <span class="kw">let </span>provider = SignedEntityRecordProvider::new(<span class="kw-2">&amp;</span>connection);
         <span class="kw">let </span>condition = provider
             .condition_by_certificate_id(<span class="string">&quot;certificate_id&quot;</span>)
@@ -1681,7 +1865,7 @@ where signed_entity_id = ?*&quot;</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>get_signed_entity_record_by_signed_certificates_ids() {
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         <span class="kw">let </span>provider = SignedEntityRecordProvider::new(<span class="kw-2">&amp;</span>connection);
         <span class="kw">let </span>condition = provider.condition_by_certificates_ids(<span class="kw-2">&amp;</span>[<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>]);
         <span class="kw">let </span>(condition, params) = condition.expand();
@@ -1708,7 +1892,7 @@ where signed_entity_id = ?*&quot;</span>;
                 .unwrap()
                 .with_timezone(<span class="kw-2">&amp;</span>Utc),
         );
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         <span class="kw">let </span>provider = InsertSignedEntityRecordProvider::new(<span class="kw-2">&amp;</span>connection);
         <span class="kw">let </span>condition = provider.get_insert_condition(signed_entity_record.clone());
         <span class="kw">let </span>(values, params) = condition.expand();
@@ -1739,7 +1923,7 @@ where signed_entity_id = ?*&quot;</span>;
     </span><span class="kw">fn </span>test_get_signed_entity_records() {
         <span class="kw">let </span>signed_entity_records = fake_signed_entity_records(<span class="number">5</span>);
 
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         setup_signed_entity_db(<span class="kw-2">&amp;</span>connection, signed_entity_records.clone()).unwrap();
 
         <span class="kw">let </span>provider = SignedEntityRecordProvider::new(<span class="kw-2">&amp;</span>connection);
@@ -1774,7 +1958,7 @@ where signed_entity_id = ?*&quot;</span>;
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_signed_entity_record_by_certificate_id() {
         <span class="kw">let </span>expected_record = fake_signed_entity_records(<span class="number">1</span>).remove(<span class="number">0</span>);
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         setup_signed_entity_db(<span class="kw-2">&amp;</span>connection, <span class="macro">vec!</span>[expected_record.clone()]).unwrap();
         <span class="kw">let </span>store = SignedEntityStoreAdapter::new(Arc::new(connection));
 
@@ -1789,7 +1973,7 @@ where signed_entity_id = ?*&quot;</span>;
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_signed_entity_record_by_certificates_ids() {
         <span class="kw">let </span>expected_records = fake_signed_entity_records(<span class="number">3</span>);
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         setup_signed_entity_db(<span class="kw-2">&amp;</span>connection, expected_records.clone()).unwrap();
         <span class="kw">let </span>store = SignedEntityStoreAdapter::new(Arc::new(connection));
         <span class="kw">let </span>certificates_ids: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = expected_records
@@ -1813,7 +1997,7 @@ where signed_entity_id = ?*&quot;</span>;
     </span><span class="kw">fn </span>test_insert_signed_entity_record() {
         <span class="kw">let </span>signed_entity_records = fake_signed_entity_records(<span class="number">5</span>);
 
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         setup_signed_entity_db(<span class="kw-2">&amp;</span>connection, Vec::new()).unwrap();
 
         <span class="kw">let </span>provider = InsertSignedEntityRecordProvider::new(<span class="kw-2">&amp;</span>connection);
@@ -1827,7 +2011,7 @@ where signed_entity_id = ?*&quot;</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>update_provider_condition() {
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         <span class="kw">let </span>provider = UpdateSignedEntityProvider::new(<span class="kw-2">&amp;</span>connection);
         <span class="kw">let </span>snapshots = fake_data::snapshots(<span class="number">1</span>);
         <span class="kw">let </span>snapshot = snapshots.first().unwrap().to_owned();
@@ -1870,7 +2054,7 @@ where signed_entity_id = ?*&quot;</span>;
     </span><span class="kw">async fn </span>update_only_given_entities() {
         <span class="kw">let </span><span class="kw-2">mut </span>signed_entity_records = fake_signed_entity_records(<span class="number">5</span>);
 
-        <span class="kw">let </span>connection = Connection::open_with_full_mutex(<span class="string">&quot;:memory:&quot;</span>).unwrap();
+        <span class="kw">let </span>connection = Connection::open_thread_safe(<span class="string">&quot;:memory:&quot;</span>).unwrap();
         setup_signed_entity_db(<span class="kw-2">&amp;</span>connection, signed_entity_records.clone()).unwrap();
         <span class="kw">let </span>store = SignedEntityStoreAdapter::new(Arc::new(connection));
 

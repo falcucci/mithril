@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["CompressionAlgorithm","ProtocolMessagePartKey"],"struct":["Beacon","Epoch","ProtocolMessage","ProtocolParameters"]};

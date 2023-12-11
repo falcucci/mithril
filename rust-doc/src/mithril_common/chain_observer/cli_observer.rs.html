@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mithril-common/src/chain_observer/cli_observer.rs`."><title>cli_observer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mithril_common" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mithril_common/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mithril-common/src/chain_observer/cli_observer.rs`."><title>cli_observer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mithril_common" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mithril_common/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -692,175 +692,6 @@
 <a href="#692" id="692">692</a>
 <a href="#693" id="693">693</a>
 <a href="#694" id="694">694</a>
-<a href="#695" id="695">695</a>
-<a href="#696" id="696">696</a>
-<a href="#697" id="697">697</a>
-<a href="#698" id="698">698</a>
-<a href="#699" id="699">699</a>
-<a href="#700" id="700">700</a>
-<a href="#701" id="701">701</a>
-<a href="#702" id="702">702</a>
-<a href="#703" id="703">703</a>
-<a href="#704" id="704">704</a>
-<a href="#705" id="705">705</a>
-<a href="#706" id="706">706</a>
-<a href="#707" id="707">707</a>
-<a href="#708" id="708">708</a>
-<a href="#709" id="709">709</a>
-<a href="#710" id="710">710</a>
-<a href="#711" id="711">711</a>
-<a href="#712" id="712">712</a>
-<a href="#713" id="713">713</a>
-<a href="#714" id="714">714</a>
-<a href="#715" id="715">715</a>
-<a href="#716" id="716">716</a>
-<a href="#717" id="717">717</a>
-<a href="#718" id="718">718</a>
-<a href="#719" id="719">719</a>
-<a href="#720" id="720">720</a>
-<a href="#721" id="721">721</a>
-<a href="#722" id="722">722</a>
-<a href="#723" id="723">723</a>
-<a href="#724" id="724">724</a>
-<a href="#725" id="725">725</a>
-<a href="#726" id="726">726</a>
-<a href="#727" id="727">727</a>
-<a href="#728" id="728">728</a>
-<a href="#729" id="729">729</a>
-<a href="#730" id="730">730</a>
-<a href="#731" id="731">731</a>
-<a href="#732" id="732">732</a>
-<a href="#733" id="733">733</a>
-<a href="#734" id="734">734</a>
-<a href="#735" id="735">735</a>
-<a href="#736" id="736">736</a>
-<a href="#737" id="737">737</a>
-<a href="#738" id="738">738</a>
-<a href="#739" id="739">739</a>
-<a href="#740" id="740">740</a>
-<a href="#741" id="741">741</a>
-<a href="#742" id="742">742</a>
-<a href="#743" id="743">743</a>
-<a href="#744" id="744">744</a>
-<a href="#745" id="745">745</a>
-<a href="#746" id="746">746</a>
-<a href="#747" id="747">747</a>
-<a href="#748" id="748">748</a>
-<a href="#749" id="749">749</a>
-<a href="#750" id="750">750</a>
-<a href="#751" id="751">751</a>
-<a href="#752" id="752">752</a>
-<a href="#753" id="753">753</a>
-<a href="#754" id="754">754</a>
-<a href="#755" id="755">755</a>
-<a href="#756" id="756">756</a>
-<a href="#757" id="757">757</a>
-<a href="#758" id="758">758</a>
-<a href="#759" id="759">759</a>
-<a href="#760" id="760">760</a>
-<a href="#761" id="761">761</a>
-<a href="#762" id="762">762</a>
-<a href="#763" id="763">763</a>
-<a href="#764" id="764">764</a>
-<a href="#765" id="765">765</a>
-<a href="#766" id="766">766</a>
-<a href="#767" id="767">767</a>
-<a href="#768" id="768">768</a>
-<a href="#769" id="769">769</a>
-<a href="#770" id="770">770</a>
-<a href="#771" id="771">771</a>
-<a href="#772" id="772">772</a>
-<a href="#773" id="773">773</a>
-<a href="#774" id="774">774</a>
-<a href="#775" id="775">775</a>
-<a href="#776" id="776">776</a>
-<a href="#777" id="777">777</a>
-<a href="#778" id="778">778</a>
-<a href="#779" id="779">779</a>
-<a href="#780" id="780">780</a>
-<a href="#781" id="781">781</a>
-<a href="#782" id="782">782</a>
-<a href="#783" id="783">783</a>
-<a href="#784" id="784">784</a>
-<a href="#785" id="785">785</a>
-<a href="#786" id="786">786</a>
-<a href="#787" id="787">787</a>
-<a href="#788" id="788">788</a>
-<a href="#789" id="789">789</a>
-<a href="#790" id="790">790</a>
-<a href="#791" id="791">791</a>
-<a href="#792" id="792">792</a>
-<a href="#793" id="793">793</a>
-<a href="#794" id="794">794</a>
-<a href="#795" id="795">795</a>
-<a href="#796" id="796">796</a>
-<a href="#797" id="797">797</a>
-<a href="#798" id="798">798</a>
-<a href="#799" id="799">799</a>
-<a href="#800" id="800">800</a>
-<a href="#801" id="801">801</a>
-<a href="#802" id="802">802</a>
-<a href="#803" id="803">803</a>
-<a href="#804" id="804">804</a>
-<a href="#805" id="805">805</a>
-<a href="#806" id="806">806</a>
-<a href="#807" id="807">807</a>
-<a href="#808" id="808">808</a>
-<a href="#809" id="809">809</a>
-<a href="#810" id="810">810</a>
-<a href="#811" id="811">811</a>
-<a href="#812" id="812">812</a>
-<a href="#813" id="813">813</a>
-<a href="#814" id="814">814</a>
-<a href="#815" id="815">815</a>
-<a href="#816" id="816">816</a>
-<a href="#817" id="817">817</a>
-<a href="#818" id="818">818</a>
-<a href="#819" id="819">819</a>
-<a href="#820" id="820">820</a>
-<a href="#821" id="821">821</a>
-<a href="#822" id="822">822</a>
-<a href="#823" id="823">823</a>
-<a href="#824" id="824">824</a>
-<a href="#825" id="825">825</a>
-<a href="#826" id="826">826</a>
-<a href="#827" id="827">827</a>
-<a href="#828" id="828">828</a>
-<a href="#829" id="829">829</a>
-<a href="#830" id="830">830</a>
-<a href="#831" id="831">831</a>
-<a href="#832" id="832">832</a>
-<a href="#833" id="833">833</a>
-<a href="#834" id="834">834</a>
-<a href="#835" id="835">835</a>
-<a href="#836" id="836">836</a>
-<a href="#837" id="837">837</a>
-<a href="#838" id="838">838</a>
-<a href="#839" id="839">839</a>
-<a href="#840" id="840">840</a>
-<a href="#841" id="841">841</a>
-<a href="#842" id="842">842</a>
-<a href="#843" id="843">843</a>
-<a href="#844" id="844">844</a>
-<a href="#845" id="845">845</a>
-<a href="#846" id="846">846</a>
-<a href="#847" id="847">847</a>
-<a href="#848" id="848">848</a>
-<a href="#849" id="849">849</a>
-<a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
-<a href="#852" id="852">852</a>
-<a href="#853" id="853">853</a>
-<a href="#854" id="854">854</a>
-<a href="#855" id="855">855</a>
-<a href="#856" id="856">856</a>
-<a href="#857" id="857">857</a>
-<a href="#858" id="858">858</a>
-<a href="#859" id="859">859</a>
-<a href="#860" id="860">860</a>
-<a href="#861" id="861">861</a>
-<a href="#862" id="862">862</a>
-<a href="#863" id="863">863</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>bech32::{<span class="self">self</span>, ToBase32, Variant};
@@ -873,20 +704,28 @@
 <span class="kw">use </span>std::path::PathBuf;
 <span class="kw">use </span>tokio::process::Command;
 
-<span class="kw">use </span><span class="kw">crate</span>::chain_observer::interface::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::chain_observer::interface::{ChainObserver, ChainObserverError};
 <span class="kw">use </span><span class="kw">crate</span>::chain_observer::{ChainAddress, TxDatum};
 <span class="kw">use </span><span class="kw">crate</span>::crypto_helper::{KESPeriod, OpCert, SerDeShelleyFileFormat};
 <span class="kw">use </span><span class="kw">crate</span>::entities::{Epoch, StakeDistribution};
 <span class="kw">use crate</span>::{CardanoNetwork, StdResult};
 
-<span class="attr">#[async_trait]
+<span class="doccomment">/// `CliRunner` trait defines the asynchronous methods
+/// for interaction with the Cardano CLI.
+</span><span class="attr">#[async_trait]
 </span><span class="kw">pub trait </span>CliRunner {
-    <span class="kw">async fn </span>launch_utxo(<span class="kw-2">&amp;</span><span class="self">self</span>, address: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;String&gt;;
-    <span class="kw">async fn </span>launch_stake_distribution(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;String&gt;;
-    <span class="kw">async fn </span>launch_stake_snapshot(<span class="kw-2">&amp;</span><span class="self">self</span>, stake_pool_id: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;String&gt;;
-    <span class="kw">async fn </span>launch_stake_snapshot_all_pools(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;String&gt;;
-    <span class="kw">async fn </span>launch_epoch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;String&gt;;
-    <span class="kw">async fn </span>launch_kes_period(<span class="kw-2">&amp;</span><span class="self">self</span>, opcert_file: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;String&gt;;
+    <span class="doccomment">/// Launches a UTxO.
+    </span><span class="kw">async fn </span>launch_utxo(<span class="kw-2">&amp;</span><span class="self">self</span>, address: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;String&gt;;
+    <span class="doccomment">/// Launches the stake distribution.
+    </span><span class="kw">async fn </span>launch_stake_distribution(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;String&gt;;
+    <span class="doccomment">/// Launches the stake snapshot.
+    </span><span class="kw">async fn </span>launch_stake_snapshot(<span class="kw-2">&amp;</span><span class="self">self</span>, stake_pool_id: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;String&gt;;
+    <span class="doccomment">/// Launches the stake snapshot for all pools.
+    </span><span class="kw">async fn </span>launch_stake_snapshot_all_pools(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;String&gt;;
+    <span class="doccomment">/// Launches the epoch info.
+    </span><span class="kw">async fn </span>launch_epoch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;String&gt;;
+    <span class="doccomment">/// Launches the kes period.
+    </span><span class="kw">async fn </span>launch_kes_period(<span class="kw-2">&amp;</span><span class="self">self</span>, opcert_file: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;String&gt;;
 }
 
 <span class="doccomment">/// A runner able to request data from a Cardano node using the
@@ -1332,186 +1171,9 @@
     <span class="kw">use </span>std::collections::BTreeMap;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::crypto_helper::ColdKeyGenerator;
+    <span class="kw">use crate</span>::{chain_observer::test_cli_runner::TestCliRunner, crypto_helper::ColdKeyGenerator};
 
     <span class="kw">use </span>kes_summed_ed25519::{kes::Sum6Kes, traits::KesSk};
-
-    <span class="kw">struct </span>TestCliRunner {
-        is_legacy: bool,
-    }
-
-    <span class="kw">impl </span>TestCliRunner {
-        <span class="kw">fn </span>new(is_legacy: bool) -&gt; <span class="self">Self </span>{
-            <span class="self">Self </span>{ is_legacy }
-        }
-
-        <span class="kw">fn </span>legacy() -&gt; <span class="self">Self </span>{
-            <span class="self">Self</span>::new(<span class="bool-val">true</span>)
-        }
-    }
-
-    <span class="kw">impl </span>Default <span class="kw">for </span>TestCliRunner {
-        <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-            <span class="self">Self</span>::new(<span class="bool-val">false</span>)
-        }
-    }
-
-    <span class="attr">#[async_trait]
-    </span><span class="kw">impl </span>CliRunner <span class="kw">for </span>TestCliRunner {
-        <span class="kw">async fn </span>launch_utxo(<span class="kw-2">&amp;</span><span class="self">self</span>, _address: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;String&gt; {
-            <span class="kw">let </span>output = <span class="string">r#&quot;
-{
-    &quot;1fd4d3e131afe3c8b212772a3f3083d2fbc6b2a7b20e54e4ff08e001598818d8#0&quot;: {
-        &quot;address&quot;: &quot;addr_test1vpcr3he05gemue6eyy0c9clajqnnww8aa2l3jszjdlszjhq093qrn&quot;,
-        &quot;datum&quot;: null,
-        &quot;inlineDatum&quot;: {
-            &quot;constructor&quot;: 0,
-            &quot;fields&quot;: [
-                {
-                    &quot;bytes&quot;: &quot;5b0a20207b0a20202020226e616d65223a20227468616c6573222c0a202020202265706f6368223a203132330a20207d2c0a20207b0a20202020226e616d65223a20227079746861676f726173222c0a202020202265706f6368223a206e756c6c0a20207d0a5d0a&quot;
-                }
-            ]
-        },
-        &quot;inlineDatumhash&quot;: &quot;b97cbaa0dc5b41864c83c2f625d9bc2a5f3e6b5cd5071c14a2090e630e188c80&quot;,
-        &quot;referenceScript&quot;: null,
-        &quot;value&quot;: {
-            &quot;lovelace&quot;: 10000000
-        }
-    },
-    &quot;1fd4d3e131afe3c8b212772a3f3083d2fbc6b2a7b20e54e4ff08e001598818d8#1&quot;: {
-        &quot;address&quot;: &quot;addr_test1vpcr3he05gemue6eyy0c9clajqnnww8aa2l3jszjdlszjhq093qrn&quot;,
-        &quot;datum&quot;: null,
-        &quot;datumhash&quot;: null,
-        &quot;inlineDatum&quot;: null,
-        &quot;referenceScript&quot;: null,
-        &quot;value&quot;: {
-            &quot;lovelace&quot;: 9989656678
-        }
-    }
-}
-&quot;#</span>;
-
-            <span class="prelude-val">Ok</span>(output.to_string())
-        }
-
-        <span class="kw">async fn </span>launch_stake_distribution(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;String&gt; {
-            <span class="kw">let </span>output = <span class="string">r#&quot;
-                           PoolId                                 Stake frac
-------------------------------------------------------------------------------
-pool1qqyjr9pcrv97gwrueunug829fs5znw6p2wxft3fvqkgu5f4qlrg   2.493e-3
-pool1qqfnw2fwajdnam7xsqhhrje5cgd8jcltzfrx655rd23eqlxjfef   2.164e-5
-pool1qqnjh80kudcjphrxftj74x22q3a4uvw8wknlxptgs7gdqtstqad   8.068e-7
-pool1qquwwu6680fr72y4779r2kpc7mxtch8rp2uhuqcc7v9p6q4f7ph   7.073e-7
-pool1qpqvz90w7qsex2al2ejjej0rfgrwsguch307w8fraw7a7adf6g8   2.474e-11
-pool1qptl80vq84xm28pt3t2lhpfzqag28csjhktxz5k6a74n260clmt   5.600e-7
-pool1qpuckgzxwgdru9vvq3ydmuqa077ur783yn2uywz7zq2c29p506e   5.161e-5
-pool1qz2vzszautc2c8mljnqre2857dpmheq7kgt6vav0s38tvvhxm6w   1.051e-6
-&quot;#</span>;
-
-            <span class="prelude-val">Ok</span>(output.to_string())
-        }
-
-        <span class="kw">async fn </span>launch_stake_snapshot(<span class="kw-2">&amp;</span><span class="self">self</span>, stake_pool_id: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;String&gt; {
-            <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="string">r#&quot;
-{
-    &quot;poolStakeGo&quot;: 1000000,
-    &quot;poolStakeSet&quot;: 2000000,
-    &quot;poolStakeMark&quot;: 3000000,
-    &quot;activeStakeGo&quot;: 5000000,
-    &quot;activeStakeSet&quot;: 7000000,
-    &quot;activeStakeMark&quot;: 9000000
-}
-&quot;#</span>;
-            <span class="kw">if </span>stake_pool_id == <span class="string">&quot;pool1qpqvz90w7qsex2al2ejjej0rfgrwsguch307w8fraw7a7adf6g8&quot; </span>{
-                output = <span class="string">r#&quot;
-                {
-                    &quot;poolStakeGo&quot;: 0,
-                    &quot;poolStakeSet&quot;: 0,
-                    &quot;poolStakeMark&quot;: 0,
-                    &quot;activeStakeGo&quot;: 5000000,
-                    &quot;activeStakeSet&quot;: 7000000,
-                    &quot;activeStakeMark&quot;: 9000000
-                }
-                &quot;#
-            </span>}
-
-            <span class="prelude-val">Ok</span>(output.to_string())
-        }
-
-        <span class="kw">async fn </span>launch_stake_snapshot_all_pools(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;String&gt; {
-            <span class="kw">let </span>output = <span class="string">r#&quot;
-{
-    &quot;pools&quot;: {
-        &quot;00000036d515e12e18cd3c88c74f09a67984c2c279a5296aa96efe89&quot;: {
-            &quot;stakeGo&quot;: 300000000000,
-            &quot;stakeMark&quot;: 300000000001,
-            &quot;stakeSet&quot;: 300000000002
-        },
-        &quot;000000f66e28b0f18aef20555f4c4954234e3270dfbbdcc13f54e799&quot;: {
-            &quot;stakeGo&quot;: 600000000000,
-            &quot;stakeMark&quot;: 600000000001,
-            &quot;stakeSet&quot;: 600000000002
-        },
-        &quot;00000110093effbf3ce788aebd3e7506b80322bd3995ad432e61fad5&quot;: {
-            &quot;stakeGo&quot;: 1200000000000,
-            &quot;stakeMark&quot;: 1200000000001,
-            &quot;stakeSet&quot;: 1200000000002
-        },
-        &quot;00000ffff93effbf3ce788aebd3e7506b80322bd3995ad432e61fad5&quot;: {
-            &quot;stakeGo&quot;: 0,
-            &quot;stakeMark&quot;: 0,
-            &quot;stakeSet&quot;: 1300000000002
-        }
-    },
-    &quot;total&quot;: {
-        &quot;stakeGo&quot;: 2100000000000,
-        &quot;stakeMark&quot;: 2100000000003,
-        &quot;stakeSet&quot;: 2100000000006
-    }
-}
-            &quot;#</span>;
-            <span class="kw">if </span><span class="self">self</span>.is_legacy {
-                <span class="prelude-val">Err</span>(<span class="macro">anyhow!</span>(
-                    <span class="string">&quot;launch_stake_snapshot_all_pools is not implemented in legacy cli runner&quot;
-                </span>))
-            } <span class="kw">else </span>{
-                <span class="prelude-val">Ok</span>(output.to_string())
-            }
-        }
-
-        <span class="kw">async fn </span>launch_epoch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;String&gt; {
-            <span class="kw">let </span>output = <span class="string">r#&quot;
-{
-    &quot;era&quot;: &quot;Alonzo&quot;,
-    &quot;syncProgress&quot;: &quot;100.00&quot;,
-    &quot;hash&quot;: &quot;f6d1b8c328697c7a4a8e7f718c79510acbcd411ff4ca19401ded13534d45a38d&quot;,
-    &quot;epoch&quot;: 120,
-    &quot;slot&quot;: 0,
-    &quot;block&quot;: 0
-}&quot;#</span>;
-
-            <span class="prelude-val">Ok</span>(output.to_string())
-        }
-
-        <span class="kw">async fn </span>launch_kes_period(<span class="kw-2">&amp;</span><span class="self">self</span>, _opcert_file: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;String&gt; {
-            <span class="kw">let </span>output = <span class="string">r#&quot;
-✓ The operational certificate counter agrees with the node protocol state counter
-✓ Operational certificate&#39;s kes period is within the correct KES period interval
-{
-    &quot;qKesNodeStateOperationalCertificateNumber&quot;: 6,
-    &quot;qKesCurrentKesPeriod&quot;: 404,
-    &quot;qKesOnDiskOperationalCertificateNumber&quot;: 6,
-    &quot;qKesRemainingSlotsInKesPeriod&quot;: 3760228,
-    &quot;qKesMaxKESEvolutions&quot;: 62,
-    &quot;qKesKesKeyExpiry&quot;: &quot;2022-03-20T21:44:51Z&quot;,
-    &quot;qKesEndKesInterval&quot;: 434,
-    &quot;qKesStartKesInterval&quot;: 372,
-    &quot;qKesSlotsPerKesPeriod&quot;: 129600
-}&quot;#</span>;
-
-            <span class="prelude-val">Ok</span>(output.to_string())
-        }
-    }
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_current_epoch() {
