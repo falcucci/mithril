@@ -89,15 +89,39 @@
 <a href="#89" id="89">89</a>
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::Context;
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>cli_table::{print_stdout, Cell, Table};
 <span class="kw">use </span>config::{builder::DefaultState, ConfigBuilder};
+<span class="kw">use </span>slog_scope::logger;
 <span class="kw">use </span>std::{collections::HashMap, sync::Arc};
 
-<span class="kw">use </span>mithril_common::StdResult;
-
-<span class="kw">use </span>mithril_client_cli::dependencies::{ConfigParameters, DependenciesBuilder};
+<span class="kw">use </span>mithril_client::ClientBuilder;
+<span class="kw">use </span>mithril_client_cli::{configuration::ConfigParameters, utils::ExpanderUtils};
+<span class="kw">use </span>mithril_common::{test_utils::fake_keys, StdResult};
 
 <span class="doccomment">/// Clap command to show a given snapshot
 </span><span class="attr">#[derive(Parser, Debug, Clone)]
@@ -116,20 +140,42 @@
     <span class="doccomment">/// Snapshot Show command
     </span><span class="kw">pub async fn </span>execute(<span class="kw-2">&amp;</span><span class="self">self</span>, config_builder: ConfigBuilder&lt;DefaultState&gt;) -&gt; StdResult&lt;()&gt; {
         <span class="kw">let </span>config = config_builder.build()<span class="question-mark">?</span>;
-        <span class="kw">let </span>params: Arc&lt;ConfigParameters&gt; = Arc::new(ConfigParameters::new(
+        <span class="kw">let </span>params = Arc::new(ConfigParameters::new(
             config.try_deserialize::&lt;HashMap&lt;String, String&gt;&gt;()<span class="question-mark">?</span>,
         ));
-        <span class="kw">let </span><span class="kw-2">mut </span>dependencies_builder = DependenciesBuilder::new(params);
-        <span class="kw">let </span>snapshot_service = dependencies_builder
-            .get_snapshot_service()
-            .<span class="kw">await
-            </span>.with_context(|| <span class="string">&quot;Dependencies Builder can not get Snapshot Service&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>snapshot_message = snapshot_service.show(<span class="kw-2">&amp;</span><span class="self">self</span>.digest).<span class="kw">await</span>.with_context(|| {
-            <span class="macro">format!</span>(
-                <span class="string">&quot;Snapshot Service can not show the snapshot for digest: &#39;{}&#39;&quot;</span>,
-                <span class="self">self</span>.digest
+        <span class="comment">// TODO: This should not be done this way.
+        // Now that mithril-client-cli uses the mithril-client library, the genesis verification key is required for all commands
+        </span><span class="kw">let </span>fallback_genesis_verification_key =
+            fake_keys::genesis_verification_key()[<span class="number">0</span>].to_string();
+        <span class="kw">let </span>client = ClientBuilder::aggregator(
+            <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;aggregator_endpoint&quot;</span>)<span class="question-mark">?</span>,
+            <span class="kw-2">&amp;</span>params.get_or(
+                <span class="string">&quot;genesis_verification_key&quot;</span>,
+                <span class="kw-2">&amp;</span>fallback_genesis_verification_key,
+            ),
+        )
+        .with_logger(logger())
+        .build()<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>get_list_of_artifact_ids = || <span class="kw">async </span>{
+            <span class="kw">let </span>snapshots = client.snapshot().list().<span class="kw">await</span>.with_context(|| {
+                <span class="string">&quot;Can not get the list of artifacts while retrieving the latest snapshot digest&quot;
+            </span>})<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(snapshots
+                .iter()
+                .map(|snapshot| snapshot.digest.to_owned())
+                .collect::&lt;Vec&lt;String&gt;&gt;())
+        };
+
+        <span class="kw">let </span>snapshot_message = client
+            .snapshot()
+            .get(
+                <span class="kw-2">&amp;</span>ExpanderUtils::expand_eventual_id_alias(<span class="kw-2">&amp;</span><span class="self">self</span>.digest, get_list_of_artifact_ids())
+                    .<span class="kw">await</span><span class="question-mark">?</span>,
             )
-        })<span class="question-mark">?</span>;
+            .<span class="kw">await</span><span class="question-mark">?
+            </span>.ok_or_else(|| <span class="macro">anyhow!</span>(<span class="string">&quot;Snapshot not found for digest: &#39;{}&#39;&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.digest))<span class="question-mark">?</span>;
 
         <span class="kw">if </span><span class="self">self</span>.json {
             <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>snapshot_message)<span class="question-mark">?</span>);

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ProgressOutputType","SnapshotUnpackerError"],"struct":["DownloadProgressReporter","ProgressPrinter","SnapshotUnpacker","StreamReader"]};
+window.SIDEBAR_ITEMS = {"enum":["ProgressOutputType","SnapshotUnpackerError"],"struct":["DownloadProgressReporter","ExpanderUtils","IndicatifFeedbackReceiver","ProgressPrinter","SnapshotUnpacker","SnapshotUtils"]};

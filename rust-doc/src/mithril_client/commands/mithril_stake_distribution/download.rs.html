@@ -107,18 +107,76 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::Context;
+<span class="kw">use </span>clap::Parser;
+<span class="kw">use </span>config::{builder::DefaultState, ConfigBuilder, Map, Source, Value, ValueKind};
+<span class="kw">use </span>slog_scope::logger;
+<span class="kw">use </span>std::{
     collections::HashMap,
     path::{Path, PathBuf},
     sync::Arc,
 };
 
-<span class="kw">use </span>anyhow::Context;
-<span class="kw">use </span>clap::Parser;
-<span class="kw">use </span>config::{builder::DefaultState, ConfigBuilder, Map, Source, Value, ValueKind};
+<span class="kw">use </span>mithril_client::{ClientBuilder, MessageBuilder};
+<span class="kw">use </span>mithril_client_cli::{configuration::ConfigParameters, utils::ExpanderUtils};
 <span class="kw">use </span>mithril_common::StdResult;
-
-<span class="kw">use </span>mithril_client_cli::dependencies::{ConfigParameters, DependenciesBuilder};
 
 <span class="doccomment">/// Download and verify a Mithril Stake Distribution information. If the
 /// verification fails, the file is not persisted.
@@ -147,30 +205,86 @@
             .set_default(<span class="string">&quot;download_dir&quot;</span>, <span class="string">&quot;.&quot;</span>)<span class="question-mark">?
             </span>.add_source(<span class="self">self</span>.clone())
             .build()<span class="question-mark">?</span>;
-        <span class="kw">let </span>params: Arc&lt;ConfigParameters&gt; = Arc::new(ConfigParameters::new(
+        <span class="kw">let </span>params = Arc::new(ConfigParameters::new(
             config.try_deserialize::&lt;HashMap&lt;String, String&gt;&gt;()<span class="question-mark">?</span>,
         ));
-        <span class="kw">let </span><span class="kw-2">mut </span>dependencies_builder = DependenciesBuilder::new(params.clone());
-        <span class="kw">let </span>service = dependencies_builder
-            .get_mithril_stake_distribution_service()
-            .<span class="kw">await
-            </span>.with_context(|| {
-                <span class="string">&quot;Dependencies Builder can not get Mithril Stake Distribution Service&quot;
+        <span class="kw">let </span>download_dir = <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;download_dir&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>download_dir = Path::new(download_dir);
+        <span class="kw">let </span>client = ClientBuilder::aggregator(
+            <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;aggregator_endpoint&quot;</span>)<span class="question-mark">?</span>,
+            <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;genesis_verification_key&quot;</span>)<span class="question-mark">?</span>,
+        )
+        .with_logger(logger())
+        .build()<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>get_list_of_artifact_ids = || <span class="kw">async </span>{
+            <span class="kw">let </span>mithril_stake_distributions = client.mithril_stake_distribution().list().<span class="kw">await</span>.with_context(|| {
+                <span class="string">&quot;Can not get the list of artifacts while retrieving the latest stake distribution hash&quot;
             </span>})<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>filepath = service
-            .download(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.artifact_hash,
-                Path::new(<span class="kw-2">&amp;</span>params.require(<span class="string">&quot;download_dir&quot;</span>)<span class="question-mark">?</span>),
-                <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;genesis_verification_key&quot;</span>)<span class="question-mark">?</span>,
+            <span class="prelude-val">Ok</span>(mithril_stake_distributions
+                .iter()
+                .map(|msd| msd.hash.to_owned())
+                .collect::&lt;Vec&lt;String&gt;&gt;())
+        };
+        <span class="kw">let </span>mithril_stake_distribution = client
+            .mithril_stake_distribution()
+            .get(
+                <span class="kw-2">&amp;</span>ExpanderUtils::expand_eventual_id_alias(
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.artifact_hash,
+                    get_list_of_artifact_ids(),
+                )
+                .<span class="kw">await</span><span class="question-mark">?</span>,
             )
-            .<span class="kw">await
+            .<span class="kw">await</span><span class="question-mark">?
             </span>.with_context(|| {
                 <span class="macro">format!</span>(
-                    <span class="string">&quot;Mithril Stake Distribution Service can not download and verify the artifact for hash: &#39;{}&#39;&quot;</span>,
+                    <span class="string">&quot;Can not download and verify the artifact for hash: &#39;{}&#39;&quot;</span>,
                     <span class="self">self</span>.artifact_hash
                 )
             })<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>certificate = client
+            .certificate()
+            .verify_chain(<span class="kw-2">&amp;</span>mithril_stake_distribution.certificate_hash)
+            .<span class="kw">await
+            </span>.with_context(|| {
+                <span class="macro">format!</span>(
+                    <span class="string">&quot;Can not verify the certificate chain from certificate_hash: &#39;{}&#39;&quot;</span>,
+                    <span class="kw-2">&amp;</span>mithril_stake_distribution.certificate_hash
+                )
+            })<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>message = MessageBuilder::new()
+            .compute_mithril_stake_distribution_message(<span class="kw-2">&amp;</span>mithril_stake_distribution)
+            .with_context(|| {
+                <span class="string">&quot;Can not compute the message for the given Mithril stake distribution&quot;
+            </span>})<span class="question-mark">?</span>;
+
+        <span class="kw">if </span>!certificate.match_message(<span class="kw-2">&amp;</span>message) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">anyhow::anyhow!</span>(
+                    <span class="string">&quot;Certificate and message did not match:\ncertificate_message: &#39;{}&#39;\n computed_message: &#39;{}&#39;&quot;</span>,
+                    certificate.signed_message,
+                    message.compute_hash()
+                ));
+        }
+
+        <span class="kw">if </span>!download_dir.is_dir() {
+            std::fs::create_dir_all(download_dir)<span class="question-mark">?</span>;
+        }
+        <span class="kw">let </span>filepath = PathBuf::new().join(download_dir).join(<span class="macro">format!</span>(
+            <span class="string">&quot;mithril_stake_distribution-{}.json&quot;</span>,
+            mithril_stake_distribution.hash
+        ));
+        std::fs::write(
+            <span class="kw-2">&amp;</span>filepath,
+            serde_json::to_string(<span class="kw-2">&amp;</span>mithril_stake_distribution).with_context(|| {
+                <span class="macro">format!</span>(
+                    <span class="string">&quot;Can not serialize stake distribution artifact &#39;{:?}&#39;&quot;</span>,
+                    mithril_stake_distribution
+                )
+            })<span class="question-mark">?</span>,
+        )<span class="question-mark">?</span>;
 
         <span class="macro">println!</span>(
             <span class="string">&quot;Mithril Stake Distribution &#39;{}&#39; has been verified and saved as &#39;{}&#39;.&quot;</span>,

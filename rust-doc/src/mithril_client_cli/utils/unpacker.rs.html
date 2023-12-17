@@ -124,18 +124,68 @@
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::Context;
-<span class="kw">use </span>flate2::read::GzDecoder;
-<span class="kw">use </span>flume::Receiver;
-<span class="kw">use </span>human_bytes::human_bytes;
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>human_bytes::human_bytes;
 <span class="kw">use </span>std::{
     fs::{create_dir_all, remove_dir},
     path::{Path, PathBuf},
 };
-<span class="kw">use </span>tar::Archive;
 <span class="kw">use </span>thiserror::Error;
 
-<span class="kw">use </span><span class="kw">crate</span>::utils::StreamReader;
 <span class="kw">use </span>mithril_common::{entities::CompressionAlgorithm, StdError, StdResult};
 
 <span class="doccomment">/// Check and unpack a downloaded archive in a given directory.
@@ -186,10 +236,9 @@
     <span class="doccomment">/// Check all prerequisites are met before starting to download and unpack
     /// big snapshot archive.
     </span><span class="kw">pub fn </span>check_prerequisites(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
         pathdir: <span class="kw-2">&amp;</span>Path,
         size: u64,
-        compressionn_algorithm: CompressionAlgorithm,
+        compression_algorithm: CompressionAlgorithm,
     ) -&gt; StdResult&lt;()&gt; {
         <span class="kw">if </span>pathdir.exists() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(
@@ -200,9 +249,10 @@
             SnapshotUnpackerError::UnpackDirectoryIsNotWritable(pathdir.to_owned(), e.into())
         })<span class="question-mark">?</span>;
         <span class="kw">let </span>free_space = fs2::available_space(pathdir)<span class="question-mark">? </span><span class="kw">as </span>f64;
-        remove_dir(pathdir)<span class="question-mark">?</span>;
+        <span class="comment">// `remove_dir` doesn&#39;t remove intermediate directories that could have been created by `create_dir_all`
+        </span>remove_dir(pathdir)<span class="question-mark">?</span>;
 
-        <span class="kw">if </span>free_space &lt; compressionn_algorithm.free_space_snapshot_ratio() * size <span class="kw">as </span>f64 {
+        <span class="kw">if </span>free_space &lt; compression_algorithm.free_space_snapshot_ratio() * size <span class="kw">as </span>f64 {
             <span class="kw">return </span><span class="prelude-val">Err</span>(SnapshotUnpackerError::NotEnoughSpace {
                 left_space: free_space,
                 pathdir: pathdir.to_owned(),
@@ -213,41 +263,101 @@
 
         <span class="prelude-val">Ok</span>(())
     }
+}
 
-    <span class="doccomment">/// Unpack the snapshot from the given stream into the given directory.
-    </span><span class="kw">pub fn </span>unpack_snapshot(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        stream: Receiver&lt;Vec&lt;u8&gt;&gt;,
-        compression_algorithm: CompressionAlgorithm,
-        unpack_dir: <span class="kw-2">&amp;</span>Path,
-    ) -&gt; StdResult&lt;()&gt; {
-        <span class="kw">let </span>input = StreamReader::new(stream);
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>mithril_common::entities::CompressionAlgorithm;
+    <span class="kw">use </span>std::fs::remove_dir_all;
 
-        <span class="kw">match </span>compression_algorithm {
-            CompressionAlgorithm::Gzip =&gt; {
-                <span class="kw">let </span>gzip_decoder = GzDecoder::new(input);
-                <span class="kw">let </span><span class="kw-2">mut </span>snapshot_archive = Archive::new(gzip_decoder);
-                snapshot_archive.unpack(unpack_dir).map_err(|e| {
-                    SnapshotUnpackerError::UnpackFailed {
-                        dirpath: unpack_dir.to_owned(),
-                        error: e.into(),
-                    }
-                })<span class="question-mark">?</span>;
-            }
-            CompressionAlgorithm::Zstandard =&gt; {
-                <span class="kw">let </span>zstandard_decoder = zstd::Decoder::new(input)
-                    .with_context(|| <span class="string">&quot;Unpack failed: Create Zstandard decoder error&quot;</span>)<span class="question-mark">?</span>;
-                <span class="kw">let </span><span class="kw-2">mut </span>snapshot_archive = Archive::new(zstandard_decoder);
-                snapshot_archive.unpack(unpack_dir).map_err(|e| {
-                    SnapshotUnpackerError::UnpackFailed {
-                        dirpath: unpack_dir.to_owned(),
-                        error: e.into(),
-                    }
-                })<span class="question-mark">?</span>;
-            }
-        };
+    <span class="kw">fn </span>create_temporary_empty_directory(name: <span class="kw-2">&amp;</span>str) -&gt; PathBuf {
+        <span class="kw">let </span>pathdir = std::env::temp_dir().join(name);
+        <span class="kw">if </span>pathdir.exists() {
+            remove_dir_all(<span class="kw-2">&amp;</span>pathdir).unwrap();
+        }
+        create_dir_all(<span class="kw-2">&amp;</span>pathdir).unwrap();
+        pathdir
+    }
 
-        <span class="prelude-val">Ok</span>(())
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>should_return_ok() {
+        <span class="kw">let </span>pathdir = create_temporary_empty_directory(<span class="string">&quot;return_ok&quot;</span>).join(<span class="string">&quot;target_directory&quot;</span>);
+
+        SnapshotUnpacker::check_prerequisites(<span class="kw-2">&amp;</span>pathdir, <span class="number">12</span>, CompressionAlgorithm::default())
+            .expect(<span class="string">&quot;check_prerequisites should not fail&quot;</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>should_return_error_if_unpack_directory_already_exists() {
+        <span class="kw">let </span>pathdir = create_temporary_empty_directory(<span class="string">&quot;existing_directory&quot;</span>);
+
+        <span class="kw">let </span>error =
+            SnapshotUnpacker::check_prerequisites(<span class="kw-2">&amp;</span>pathdir, <span class="number">12</span>, CompressionAlgorithm::default())
+                .expect_err(<span class="string">&quot;check_prerequisites should fail&quot;</span>);
+
+        <span class="macro">assert!</span>(
+            <span class="macro">matches!</span>(
+                error.downcast_ref::&lt;SnapshotUnpackerError&gt;(),
+                <span class="prelude-val">Some</span>(SnapshotUnpackerError::UnpackDirectoryAlreadyExists(<span class="kw">_</span>))
+            ),
+            <span class="string">&quot;Unexpected error: {:?}&quot;</span>,
+            error
+        );
+    }
+
+    <span class="comment">// This test is not runned on Windows because `set_readonly` is not working on Windows 7+
+    // https://doc.rust-lang.org/std/fs/struct.Permissions.html#method.set_readonly
+    </span><span class="attr">#[cfg(not(target_os = <span class="string">&quot;windows&quot;</span>))]
+    #[test]
+    </span><span class="kw">fn </span>should_return_error_if_directory_could_not_be_created() {
+        <span class="kw">let </span>pathdir = create_temporary_empty_directory(<span class="string">&quot;read_only_directory&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>perms = std::fs::metadata(<span class="kw-2">&amp;</span>pathdir).unwrap().permissions();
+        perms.set_readonly(<span class="bool-val">true</span>);
+        std::fs::set_permissions(<span class="kw-2">&amp;</span>pathdir, perms).unwrap();
+
+        <span class="kw">let </span>targetdir = pathdir.join(<span class="string">&quot;target_directory&quot;</span>);
+
+        <span class="kw">let </span>error =
+            SnapshotUnpacker::check_prerequisites(<span class="kw-2">&amp;</span>targetdir, <span class="number">12</span>, CompressionAlgorithm::default())
+                .expect_err(<span class="string">&quot;check_prerequisites should fail&quot;</span>);
+
+        <span class="macro">assert!</span>(
+            <span class="macro">matches!</span>(
+                error.downcast_ref::&lt;SnapshotUnpackerError&gt;(),
+                <span class="prelude-val">Some</span>(SnapshotUnpackerError::UnpackDirectoryIsNotWritable(<span class="kw">_</span>, <span class="kw">_</span>))
+            ),
+            <span class="string">&quot;Unexpected error: {:?}&quot;</span>,
+            error
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>should_return_error_if_not_enough_available_space() {
+        <span class="kw">let </span>pathdir =
+            create_temporary_empty_directory(<span class="string">&quot;enough_available_space&quot;</span>).join(<span class="string">&quot;target_directory&quot;</span>);
+        <span class="kw">let </span>archive_size = u64::MAX;
+
+        <span class="kw">let </span>error = SnapshotUnpacker::check_prerequisites(
+            <span class="kw-2">&amp;</span>pathdir,
+            archive_size,
+            CompressionAlgorithm::default(),
+        )
+        .expect_err(<span class="string">&quot;check_prerequisites should fail&quot;</span>);
+
+        <span class="macro">assert!</span>(
+            <span class="macro">matches!</span>(
+                error.downcast_ref::&lt;SnapshotUnpackerError&gt;(),
+                <span class="prelude-val">Some</span>(SnapshotUnpackerError::NotEnoughSpace {
+                    left_space: <span class="kw">_</span>,
+                    pathdir: <span class="kw">_</span>,
+                    archive_size: <span class="kw">_
+                </span>})
+            ),
+            <span class="string">&quot;Unexpected error: {:?}&quot;</span>,
+            error
+        );
     }
 }
 </code></pre></div></section></main></body></html>

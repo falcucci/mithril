@@ -377,8 +377,8 @@
 }
 
 <span class="doccomment">/// API that defines a client for the Aggregator
-</span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
-#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
+</span><span class="attr">#[cfg_attr(target_family = <span class="string">&quot;wasm&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_family = <span class="string">&quot;wasm&quot;</span>), async_trait)]
 </span><span class="kw">pub trait </span>AggregatorClient: Sync + Send {
     <span class="doccomment">/// Get the content back from the Aggregator
     </span><span class="kw">async fn </span>get_content(
@@ -450,8 +450,8 @@
     </span>}
 
     <span class="doccomment">/// Perform a HTTP GET request on the Aggregator and return the given JSON
-    </span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_recursion(<span class="question-mark">?</span>Send))]
-    #[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_recursion)]
+    </span><span class="attr">#[cfg_attr(target_family = <span class="string">&quot;wasm&quot;</span>, async_recursion(<span class="question-mark">?</span>Send))]
+    #[cfg_attr(not(target_family = <span class="string">&quot;wasm&quot;</span>), async_recursion)]
     </span><span class="kw">async fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, url: Url) -&gt; <span class="prelude-ty">Result</span>&lt;Response, AggregatorClientError&gt; {
         <span class="macro">debug!</span>(<span class="self">self</span>.logger, <span class="string">&quot;GET url=&#39;{url}&#39;.&quot;</span>);
         <span class="kw">let </span>request_builder = <span class="self">self</span>.http_client.get(url.clone());
@@ -522,8 +522,8 @@
 }
 
 <span class="attr">#[cfg_attr(test, automock)]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
-#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
+#[cfg_attr(target_family = <span class="string">&quot;wasm&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_family = <span class="string">&quot;wasm&quot;</span>), async_trait)]
 </span><span class="kw">impl </span>AggregatorClient <span class="kw">for </span>AggregatorHTTPClient {
     <span class="kw">async fn </span>get_content(
         <span class="kw-2">&amp;</span><span class="self">self</span>,

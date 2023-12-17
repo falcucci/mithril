@@ -652,8 +652,8 @@
 <span class="doccomment">/// CertificateVerifier is the cryptographic engine in charge of verifying multi signatures and
 /// [certificates](Certificate)
 </span><span class="attr">#[cfg_attr(test, automock)]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
-#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
+#[cfg_attr(target_family = <span class="string">&quot;wasm&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_family = <span class="string">&quot;wasm&quot;</span>), async_trait)]
 </span><span class="kw">pub trait </span>CertificateVerifier: Send + Sync {
     <span class="doccomment">/// Verify Genesis certificate
     </span><span class="kw">async fn </span>verify_genesis_certificate(
@@ -825,8 +825,8 @@
     }
 }
 
-<span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
-#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
+<span class="attr">#[cfg_attr(target_family = <span class="string">&quot;wasm&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_family = <span class="string">&quot;wasm&quot;</span>), async_trait)]
 </span><span class="kw">impl </span>CertificateVerifier <span class="kw">for </span>MithrilCertificateVerifier {
     <span class="doccomment">/// Verify Genesis certificate
     </span><span class="kw">async fn </span>verify_genesis_certificate(

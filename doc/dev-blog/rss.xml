@@ -20,7 +20,7 @@
 <p>Here are some useful documentation that can be used by developers:</p>
 <ul>
 <li><strong>Developer documentation</strong>: <a href="https://docs.rs/mithril-client/0.5.7/mithril_client/">https://docs.rs/mithril-client/0.5.7/mithril_client/</a></li>
-<li><strong>Example of implementations</strong>:<a href="https://github.com/input-output-hk/mithril/blob/main/mithril-client/examples/">https://github.com/input-output-hk/mithril/blob/main/mithril-client/examples/</a></li>
+<li><strong>Example of implementations</strong>:<a href="https://github.com/input-output-hk/mithril/blob/main/examples/">https://github.com/input-output-hk/mithril/blob/main/examples/</a></li>
 <li><strong>Mithril client repository</strong>: <a href="https://github.com/input-output-hk/mithril/tree/main/mithril-client">https://github.com/input-output-hk/mithril/tree/main/mithril-client</a></li>
 <li><strong>Crates.io</strong>: <a href="https://crates.io/crates/mithril-client">https://crates.io/crates/mithril-client</a></li>
 </ul>
@@ -353,7 +353,7 @@ sqlite3 ${DATA_STORES_DIRECTORY}/signer.sqlite3 "UPDATE protocol_initializer SET
 <h2 id="how-to-migrate-data-from-old-storage-system-to-sqlite-stores">How to migrate data from old storage system to SQLite stores?</h2>
 <p>There are 2 ways of getting the new version and the associated migration tool. Either downloading binaries from GitHub or compiling them yourself.</p>
 <h3 id="downloading">Downloading</h3>
-<p>Download the new <code>mithril-signer</code> and <code>mithril-signer-migrate</code> files from the <a href="https://github.com/input-output-hk/mithril/releases/tag/nightly">nightly builds page</a>. Make them executable:</p>
+<p>Download the new <code>mithril-signer</code> and <code>mithril-signer-migrate</code> files from the <a href="https://github.com/input-output-hk/mithril/releases/tag/unstable">nightly builds page</a>. Make them executable:</p>
 <pre><code>$&gt; chmod +x mithril-signer*
 $&gt; ls -1F mithril-signer*
 mithril-signer*
